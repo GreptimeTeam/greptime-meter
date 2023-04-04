@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "cu-core",
+    "cu-example",
+]
