@@ -1,10 +1,15 @@
 use std::collections::HashMap;
 
-use cu_core::{
-    collect::Collect,
-    cu_query::{CuQuery, RcuCount, WcuCount},
-    data::{ReadRecord, RegionId, Scenes, ServiceId, TableId, WriteRecord},
-};
+use cu_core::collect::Collect;
+use cu_core::cu_query::CuQuery;
+use cu_core::cu_query::RcuCount;
+use cu_core::cu_query::WcuCount;
+use cu_core::data::ReadRecord;
+use cu_core::data::RegionId;
+use cu_core::data::Scenes;
+use cu_core::data::ServiceId;
+use cu_core::data::TableId;
+use cu_core::data::WriteRecord;
 use dashmap::DashMap;
 
 pub struct SimpleCollector<W, R> {

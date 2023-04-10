@@ -2,11 +2,10 @@ use std::sync::Arc;
 
 use parking_lot::RwLock;
 
-use crate::{
-    collect::Collect,
-    data::{ReadRecord, WriteRecord},
-    reporter::Reporter,
-};
+use crate::collect::Collect;
+use crate::data::ReadRecord;
+use crate::data::WriteRecord;
+use crate::reporter::Reporter;
 
 #[derive(Default, Clone)]
 pub struct Registry {

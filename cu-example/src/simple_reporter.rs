@@ -1,10 +1,13 @@
-use std::{marker::PhantomData, sync::Arc, time::Duration};
+use std::marker::PhantomData;
+use std::sync::Arc;
+use std::time::Duration;
 
-use cu_core::{
-    cu_query::{CuQuery, RcuCount, WcuCount},
-    data::{ReadRecord, WriteRecord},
-    reporter::Reporter,
-};
+use cu_core::cu_query::CuQuery;
+use cu_core::cu_query::RcuCount;
+use cu_core::cu_query::WcuCount;
+use cu_core::data::ReadRecord;
+use cu_core::data::WriteRecord;
+use cu_core::reporter::Reporter;
 use tracing::info;
 
 pub struct SimpleReporter<C, W, R> {

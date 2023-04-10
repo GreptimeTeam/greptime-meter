@@ -1,6 +1,10 @@
-use crate::data::{ReadRecord, RegionId, ServiceId, TableId, WriteRecord};
-
 use std::collections::HashMap;
+
+use crate::data::ReadRecord;
+use crate::data::RegionId;
+use crate::data::ServiceId;
+use crate::data::TableId;
+use crate::data::WriteRecord;
 
 pub type WcuCount = u32;
 pub type RcuCount = u32;
