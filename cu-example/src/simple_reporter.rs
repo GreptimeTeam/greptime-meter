@@ -45,18 +45,18 @@ where
             self.cu_query.clear();
 
             info!("The number of WCUs consumed in the last 5 seconds:");
-            for (id, wcu_numer) in wcus {
+            for (id, wcu_number) in wcus {
                 info!(
                     "catalog {}, schema {}, wcus: {}",
-                    id.catalog, id.schema, wcu_numer
+                    id.catalog, id.schema, wcu_number
                 );
             }
 
             info!("The number of RCUs consumed in the last 5 seconds:");
-            for (id, rcu_numer) in rcus {
+            for (id, rcu_number) in rcus {
                 info!(
                     "catalog {}, schema {}, rcus: {}",
-                    id.catalog, id.schema, rcu_numer
+                    id.catalog, id.schema, rcu_number
                 );
             }
         }
