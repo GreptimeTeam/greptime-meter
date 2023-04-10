@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
 use crate::data::ReadRecord;
-use crate::data::RegionId;
-use crate::data::ServiceId;
-use crate::data::TableId;
 use crate::data::WriteRecord;
 
 pub type WcuCount = u32;
@@ -41,16 +38,40 @@ where
     /// Note: If clear is executed, the previous data will not be counted.
     fn table_rcus(&self) -> HashMap<TableId, WcuCount>;
 
-    /// Get all wcu data by service dimension.
+    /// Get all wcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn service_wcus(&self) -> HashMap<ServiceId, WcuCount>;
+    fn schema_wcus(&self) -> HashMap<SchemaId, WcuCount>;
 
-    /// Get all rcu data by service dimension.
+    /// Get all rcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn service_rcus(&self) -> HashMap<ServiceId, RcuCount>;
+    fn schema_rcus(&self) -> HashMap<SchemaId, RcuCount>;
 
     /// Clear all data.
     fn clear(&self);
+}
+
+/// The SchemaId identifies a database.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct SchemaId {
+    pub catalog: String,
+    pub schema: String,
+}
+
+/// The TableId identifies a table.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct TableId {
+    pub catalog: String,
+    pub schema: String,
+    pub table: String,
+}
+
+/// The RegionId identifies a region.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct RegionId {
+    pub catalog: String,
+    pub schema: String,
+    pub table: String,
+    pub region_num: u32,
 }
