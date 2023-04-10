@@ -4,7 +4,7 @@ use cu_core::collect::Collect;
 use cu_core::cu_query::CuQuery;
 use cu_core::cu_query::RcuCount;
 use cu_core::cu_query::RegionId;
-use cu_core::cu_query::ServiceId;
+use cu_core::cu_query::SchemaId;
 use cu_core::cu_query::TableId;
 use cu_core::cu_query::WcuCount;
 use cu_core::data::ReadRecord;
@@ -13,8 +13,8 @@ use cu_core::data::WriteRecord;
 use dashmap::DashMap;
 
 pub struct SimpleCollector<W, R> {
-    read_data: DashMap<ServiceId, Vec<ReadRecord>>,
-    write_data: DashMap<ServiceId, Vec<WriteRecord>>,
+    read_data: DashMap<SchemaId, Vec<ReadRecord>>,
+    write_data: DashMap<SchemaId, Vec<WriteRecord>>,
     wcu_calc: W,
     rcu_calc: R,
 }
@@ -48,7 +48,7 @@ where
         self.write_data.clear();
     }
 
-    fn service_wcus(&self) -> HashMap<ServiceId, WcuCount> {
+    fn schema_wcus(&self) -> HashMap<SchemaId, WcuCount> {
         self.write_data
             .iter()
             .map(|write_infos| {
@@ -62,7 +62,7 @@ where
             .collect()
     }
 
-    fn service_rcus(&self) -> HashMap<ServiceId, RcuCount> {
+    fn schema_rcus(&self) -> HashMap<SchemaId, RcuCount> {
         self.read_data
             .iter()
             .map(|read_infos| {
@@ -103,12 +103,12 @@ where
             unimplemented!()
         }
 
-        let service_id = ServiceId {
+        let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),
         };
 
-        let mut entry = self.read_data.entry(service_id).or_insert_with(Vec::new);
+        let mut entry = self.read_data.entry(schema_id).or_insert_with(Vec::new);
 
         entry.push(record)
     }
@@ -118,12 +118,12 @@ where
             unimplemented!()
         }
 
-        let service_id = ServiceId {
+        let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),
         };
 
-        let mut entry = self.write_data.entry(service_id).or_insert_with(Vec::new);
+        let mut entry = self.write_data.entry(schema_id).or_insert_with(Vec::new);
 
         entry.push(record)
     }

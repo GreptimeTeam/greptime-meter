@@ -43,8 +43,8 @@ where
             tokio::time::sleep(Duration::from_secs(5)).await;
             info!("===============================================================");
 
-            let wcus = self.cu_query.service_wcus();
-            let rcus = self.cu_query.service_rcus();
+            let wcus = self.cu_query.schema_wcus();
+            let rcus = self.cu_query.schema_rcus();
             self.cu_query.clear();
 
             info!("The number of WCUs consumed in the last 5 seconds:");

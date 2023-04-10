@@ -38,23 +38,23 @@ where
     /// Note: If clear is executed, the previous data will not be counted.
     fn table_rcus(&self) -> HashMap<TableId, WcuCount>;
 
-    /// Get all wcu data by service dimension.
+    /// Get all wcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn service_wcus(&self) -> HashMap<ServiceId, WcuCount>;
+    fn schema_wcus(&self) -> HashMap<SchemaId, WcuCount>;
 
-    /// Get all rcu data by service dimension.
+    /// Get all rcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn service_rcus(&self) -> HashMap<ServiceId, RcuCount>;
+    fn schema_rcus(&self) -> HashMap<SchemaId, RcuCount>;
 
     /// Clear all data.
     fn clear(&self);
 }
 
-/// The ServiceId identifies a database.
+/// The SchemaId identifies a database.
 #[derive(Eq, PartialEq, Hash, Clone, Debug)]
-pub struct ServiceId {
+pub struct SchemaId {
     pub catalog: String,
     pub schema: String,
 }
