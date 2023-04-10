@@ -1,5 +1,2 @@
 [workspace]
-members = [
-    "cu-core",
-    "cu-example",
-]
+members = ["cu-core", "cu-example"]
