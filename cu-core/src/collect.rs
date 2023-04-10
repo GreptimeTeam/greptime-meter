@@ -1,4 +1,5 @@
-use crate::data::{ReadRecord, WriteRecord};
+use crate::data::ReadRecord;
+use crate::data::WriteRecord;
 
 /// Trait representing the methods required to collect read/write record.
 pub trait Collect: Send + Sync {

@@ -1,11 +1,13 @@
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
+use std::time::Duration;
 
-use cu_core::{
-    data::{ReadRecord, Scenes, WriteRecord},
-    global::global_registry,
-    registry::Registry,
-};
-use cu_example::{simple_collector::SimpleCollector, simple_reporter::SimpleReporter};
+use cu_core::data::ReadRecord;
+use cu_core::data::Scenes;
+use cu_core::data::WriteRecord;
+use cu_core::global::global_registry;
+use cu_core::registry::Registry;
+use cu_example::simple_collector::SimpleCollector;
+use cu_example::simple_reporter::SimpleReporter;
 
 fn main() {
     tracing::subscriber::set_global_default(tracing_subscriber::FmtSubscriber::builder().finish())
