@@ -2,6 +2,7 @@ use once_cell::sync::OnceCell;
 
 use crate::registry::Registry;
 
+/// Provide a global [Registry].
 pub fn global_registry() -> Registry {
     static GLOBAL_REGISTRY: OnceCell<Registry> = OnceCell::new();
 

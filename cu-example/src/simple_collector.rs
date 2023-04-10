@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use cu_core::collect::Collect;
 use cu_core::cu_query::CuQuery;
 use cu_core::cu_query::RcuCount;
+use cu_core::cu_query::RegionId;
+use cu_core::cu_query::ServiceId;
+use cu_core::cu_query::TableId;
 use cu_core::cu_query::WcuCount;
 use cu_core::data::ReadRecord;
-use cu_core::data::RegionId;
 use cu_core::data::Scenes;
-use cu_core::data::ServiceId;
-use cu_core::data::TableId;
 use cu_core::data::WriteRecord;
 use dashmap::DashMap;
 

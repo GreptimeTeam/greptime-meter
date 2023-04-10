@@ -19,11 +19,13 @@ struct Inner {
 }
 
 impl Registry {
+    /// Set [Collect] for [Registry].
     pub fn set_collector(&self, collector: Arc<dyn Collect>) {
         let mut guard = self.inner.collector.write();
         *guard = Some(collector);
     }
 
+    /// Set [Reporter] for [Registry].
     pub fn set_reporter(&mut self, reporter: Arc<dyn Reporter>) {
         let mut guard = self.inner.reporter.write();
         *guard = Some(reporter);
@@ -42,6 +44,7 @@ impl Registry {
         }
     }
 
+    /// A base API for recording WCU consumption.
     pub fn record_write(&self, info: WriteRecord) {
         let collector = self.inner.collector.read();
 
@@ -53,6 +56,7 @@ impl Registry {
         collector.on_write(info);
     }
 
+    /// A base API for recording RCU consumption.
     pub fn record_read(&self, info: ReadRecord) {
         let collector = self.inner.collector.read();
 

@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
 use crate::data::ReadRecord;
-use crate::data::RegionId;
-use crate::data::ServiceId;
-use crate::data::TableId;
 use crate::data::WriteRecord;
 
 pub type WcuCount = u32;
@@ -53,4 +50,28 @@ where
 
     /// Clear all data.
     fn clear(&self);
+}
+
+/// The ServiceId identifies a database.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct ServiceId {
+    pub catalog: String,
+    pub schema: String,
+}
+
+/// The TableId identifies a table.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct TableId {
+    pub catalog: String,
+    pub schema: String,
+    pub table: String,
+}
+
+/// The RegionId identifies a region.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct RegionId {
+    pub catalog: String,
+    pub schema: String,
+    pub table: String,
+    pub region_num: u32,
 }
