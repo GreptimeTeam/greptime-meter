@@ -34,10 +34,3 @@ pub struct ReadRecord {
     /// Unit is byte.
     pub network_egress: u32,
 }
-
-/// Use Scenarios of the record.
-#[derive(Debug)]
-pub enum Scenes {
-    RateLimit,
-    DistributedScheduling,
-}
