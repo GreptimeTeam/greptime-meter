@@ -40,16 +40,16 @@ async fn setup_global_registry() {
 }
 
 async fn do_some_record(r: Registry) {
-    struct MockInsertRquest;
+    struct MockInsertRequest;
 
-    impl WriteCalc for MockInsertRquest {
+    impl WriteCalc for MockInsertRequest {
         fn byte_count(&self) -> u32 {
             1024 * 10
         }
     }
 
     for _i in 0..20 {
-        let insert_req = MockInsertRquest {};
+        let insert_req = MockInsertRequest {};
         wcu!("greptime", "db1", insert_req);
         // wcu!("greptime", "db1", insert_req.byte_count());
 
