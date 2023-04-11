@@ -4,3 +4,4 @@ pub mod data;
 pub mod global;
 pub mod registry;
 pub mod reporter;
+pub mod write_calc;

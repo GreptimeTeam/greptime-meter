@@ -5,8 +5,10 @@ use cu_core::data::ReadRecord;
 use cu_core::data::WriteRecord;
 use cu_core::global::global_registry;
 use cu_core::registry::Registry;
+use cu_core::write_calc::WriteCalc;
 use cu_example::simple_collector::SimpleCollector;
 use cu_example::simple_reporter::SimpleReporter;
+use cu_macros::wcu;
 
 fn main() {
     tracing::subscriber::set_global_default(tracing_subscriber::FmtSubscriber::builder().finish())
@@ -38,14 +40,18 @@ async fn setup_global_registry() {
 }
 
 async fn do_some_record(r: Registry) {
+    struct MockInsertRquest;
+
+    impl WriteCalc for MockInsertRquest {
+        fn byte_count(&self) -> u32 {
+            1024 * 10
+        }
+    }
+
     for _i in 0..20 {
-        r.record_write(WriteRecord {
-            catalog: "greptime".to_string(),
-            schema: "db1".to_string(),
-            table: None,
-            region_num: None,
-            byte_count: 10 * 1024,
-        });
+        let insert_req = MockInsertRquest {};
+        wcu!("greptime", "db1", insert_req);
+        // wcu!("greptime", "db1", insert_req.byte_count());
 
         r.record_read(ReadRecord {
             catalog: "greptime".to_string(),
