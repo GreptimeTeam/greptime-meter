@@ -1,3 +1,30 @@
+/// Record the consumption of wcu.
+///
+/// # Examples
+///
+/// ```rust
+/// use cu_core::write_calc::WriteCalc;
+/// use cu_macros::wcu;
+///
+/// // catalog: "greptime", schema: "public", byte_count: 1024 * 10.
+/// wcu!("greptime", "public", 1024 * 10);
+///
+/// // catalog: "greptime", schema: "public", table: "system_log", byte_count: 1024 * 10.
+/// wcu!("greptime", "public", "system_log", 1024 * 10);
+///
+/// // catalog: "greptime", schema: "public", table: "system_log", region: 0, byte_count: 1024 * 10.
+/// wcu!("greptime", "public", "system_log", 0, 1024 * 10);
+///
+/// struct MockInsert;
+///
+/// impl WriteCalc for MockInsert {
+///     fn byte_count(&self) -> u32 {
+///         10 * 1024
+///     }
+/// }
+///
+/// wcu!("greptime", "public", MockInsert);
+/// ```
 #[macro_export]
 macro_rules! wcu {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
@@ -30,34 +57,4 @@ macro_rules! wcu {
         };
         cu_core::global::global_registry().record_write(record);
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use cu_core::write_calc::WriteCalc;
-
-    #[test]
-    fn test_wcu_macro() {
-        let catalog = "greptime";
-        let schema = "public";
-        let table = "system_log";
-        let region_num = 1;
-        let byte_count = 1024;
-
-        wcu!(catalog, schema, table, region_num, byte_count);
-        wcu!("catalog".to_string(), schema, table, byte_count);
-        wcu!(catalog, schema, byte_count);
-
-        struct MockInsert;
-
-        impl WriteCalc for MockInsert {
-            fn byte_count(&self) -> u32 {
-                10 * 1024
-            }
-        }
-        wcu!(catalog, schema, MockInsert);
-        wcu!(catalog, schema, MockInsert.byte_count());
-        wcu!(catalog, schema, table, region_num, MockInsert);
-        wcu!("catalog".to_string(), schema, table, MockInsert);
-    }
 }
