@@ -8,11 +8,6 @@ pub struct WriteRecord {
 
     /// Volume of data written in byte.
     pub byte_count: u32,
-
-    /// Use Scenarios of the record.
-    ///
-    /// Collector can procces the record according to the usage scenarios.
-    pub scenes: Scenes,
 }
 
 /// The ReadRecord records some data about consumed rcu.
@@ -38,11 +33,6 @@ pub struct ReadRecord {
     ///
     /// Unit is byte.
     pub network_egress: u32,
-
-    /// Use Scenarios of the record.
-    ///
-    /// Collector can procces the record according to the usage scenarios.
-    pub scenes: Scenes,
 }
 
 /// Use Scenarios of the record.
