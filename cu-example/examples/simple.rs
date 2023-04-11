@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use cu_core::data::ReadRecord;
-use cu_core::data::Scenes;
 use cu_core::data::WriteRecord;
 use cu_core::global::global_registry;
 use cu_core::registry::Registry;
@@ -46,7 +45,6 @@ async fn do_some_record(r: Registry) {
             table: None,
             region_num: None,
             byte_count: 10 * 1024,
-            scenes: Scenes::RateLimit,
         });
 
         r.record_read(ReadRecord {
@@ -57,7 +55,6 @@ async fn do_some_record(r: Registry) {
             cpu_time: 3,
             table_scan: 0,
             network_egress: 0,
-            scenes: Scenes::RateLimit,
         });
 
         tokio::time::sleep(Duration::from_secs(1)).await;

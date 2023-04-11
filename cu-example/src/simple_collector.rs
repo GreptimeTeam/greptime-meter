@@ -8,7 +8,6 @@ use cu_core::cu_query::SchemaId;
 use cu_core::cu_query::TableId;
 use cu_core::cu_query::WcuCount;
 use cu_core::data::ReadRecord;
-use cu_core::data::Scenes;
 use cu_core::data::WriteRecord;
 use dashmap::DashMap;
 
@@ -99,10 +98,6 @@ where
     W: Send + Sync,
 {
     fn on_read(&self, record: ReadRecord) {
-        if let Scenes::DistributedScheduling = record.scenes {
-            unimplemented!()
-        }
-
         let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),
@@ -114,10 +109,6 @@ where
     }
 
     fn on_write(&self, record: WriteRecord) {
-        if let Scenes::DistributedScheduling = record.scenes {
-            unimplemented!()
-        }
-
         let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),

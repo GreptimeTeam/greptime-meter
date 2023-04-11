@@ -45,7 +45,7 @@ impl Registry {
     }
 
     /// A base API for recording WCU consumption.
-    pub fn record_write(&self, info: WriteRecord) {
+    pub fn record_write(&self, record: WriteRecord) {
         let collector = self.inner.collector.read();
 
         let collector = match collector.as_ref() {
@@ -53,11 +53,11 @@ impl Registry {
             None => return,
         };
 
-        collector.on_write(info);
+        collector.on_write(record);
     }
 
     /// A base API for recording RCU consumption.
-    pub fn record_read(&self, info: ReadRecord) {
+    pub fn record_read(&self, record: ReadRecord) {
         let collector = self.inner.collector.read();
 
         let collector = match collector.as_ref() {
@@ -65,8 +65,6 @@ impl Registry {
             None => return,
         };
 
-        collector.on_read(info);
+        collector.on_read(record);
     }
-
-    // TODO(fys): provide better api design
 }
