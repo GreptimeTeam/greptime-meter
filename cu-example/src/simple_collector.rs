@@ -9,6 +9,7 @@ use cu_core::cu_query::TableId;
 use cu_core::cu_query::WcuCount;
 use cu_core::data::ReadRecord;
 use cu_core::data::WriteRecord;
+use cu_core::error::Result;
 use dashmap::DashMap;
 
 pub struct SimpleCollector<W, R> {
@@ -47,8 +48,9 @@ where
         self.write_data.clear();
     }
 
-    fn schema_wcus(&self) -> HashMap<SchemaId, WcuCount> {
-        self.write_data
+    fn schema_wcus(&self) -> Result<HashMap<SchemaId, WcuCount>> {
+        Ok(self
+            .write_data
             .iter()
             .map(|write_infos| {
                 let wcus: u32 = write_infos
@@ -58,11 +60,12 @@ where
                     .sum();
                 (write_infos.key().clone(), wcus)
             })
-            .collect()
+            .collect())
     }
 
-    fn schema_rcus(&self) -> HashMap<SchemaId, RcuCount> {
-        self.read_data
+    fn schema_rcus(&self) -> Result<HashMap<SchemaId, RcuCount>> {
+        Ok(self
+            .read_data
             .iter()
             .map(|read_infos| {
                 let rcus: u32 = read_infos
@@ -72,22 +75,22 @@ where
                     .sum();
                 (read_infos.key().clone(), rcus)
             })
-            .collect()
+            .collect())
     }
 
-    fn region_wcus(&self) -> HashMap<RegionId, WcuCount> {
+    fn region_wcus(&self) -> Result<HashMap<RegionId, WcuCount>> {
         unimplemented!()
     }
 
-    fn region_rcus(&self) -> HashMap<RegionId, WcuCount> {
+    fn region_rcus(&self) -> Result<HashMap<RegionId, WcuCount>> {
         unimplemented!()
     }
 
-    fn table_wcus(&self) -> HashMap<TableId, WcuCount> {
+    fn table_wcus(&self) -> Result<HashMap<TableId, WcuCount>> {
         unimplemented!()
     }
 
-    fn table_rcus(&self) -> HashMap<TableId, WcuCount> {
+    fn table_rcus(&self) -> Result<HashMap<TableId, WcuCount>> {
         unimplemented!()
     }
 }
