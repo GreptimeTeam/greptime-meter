@@ -19,11 +19,4 @@ pub enum Error {
     },
 }
 
-#[derive(Debug, Snafu)]
-#[snafu(visibility(pub))]
-pub enum Error1 {
-    #[snafu(display("No calculation formula for wcu set!"))]
-    WcuCalc { location: Location },
-}
-
 pub type Result<T> = std::result::Result<T, Error>;
