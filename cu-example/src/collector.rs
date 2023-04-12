@@ -1,15 +1,8 @@
 use std::collections::HashMap;
 
 use cu_core::collect::Collect;
-use cu_core::cu_query::CuQuery;
-use cu_core::cu_query::RcuCount;
-use cu_core::cu_query::RegionId;
-use cu_core::cu_query::SchemaId;
-use cu_core::cu_query::TableId;
-use cu_core::cu_query::WcuCount;
 use cu_core::data::ReadRecord;
 use cu_core::data::WriteRecord;
-use cu_core::error::Result;
 use dashmap::DashMap;
 
 pub struct SimpleCollector<W, R> {
@@ -17,6 +10,13 @@ pub struct SimpleCollector<W, R> {
     write_data: DashMap<SchemaId, Vec<WriteRecord>>,
     wcu_calc: W,
     rcu_calc: R,
+}
+
+/// The SchemaId identifies a database.
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
+pub struct SchemaId {
+    pub catalog: String,
+    pub schema: String,
 }
 
 impl<W, R> SimpleCollector<W, R> {
@@ -30,27 +30,18 @@ impl<W, R> SimpleCollector<W, R> {
     }
 }
 
-impl<W, R> CuQuery<W, R> for SimpleCollector<W, R>
+impl<W, R> SimpleCollector<W, R>
 where
     R: Fn(&ReadRecord) -> u32 + Send + Sync,
     W: Fn(&WriteRecord) -> u32 + Send + Sync,
 {
-    fn set_wcu_calc(&mut self, calc: W) {
-        self.wcu_calc = calc;
-    }
-
-    fn set_rcu_calc(&mut self, calc: R) {
-        self.rcu_calc = calc;
-    }
-
-    fn clear(&self) {
+    pub fn clear(&self) {
         self.read_data.clear();
         self.write_data.clear();
     }
 
-    fn schema_wcus(&self) -> Result<HashMap<SchemaId, WcuCount>> {
-        Ok(self
-            .write_data
+    pub fn schema_wcus(&self) -> HashMap<SchemaId, u32> {
+        self.write_data
             .iter()
             .map(|write_infos| {
                 let wcus: u32 = write_infos
@@ -60,12 +51,11 @@ where
                     .sum();
                 (write_infos.key().clone(), wcus)
             })
-            .collect())
+            .collect()
     }
 
-    fn schema_rcus(&self) -> Result<HashMap<SchemaId, RcuCount>> {
-        Ok(self
-            .read_data
+    pub fn schema_rcus(&self) -> HashMap<SchemaId, u32> {
+        self.read_data
             .iter()
             .map(|read_infos| {
                 let rcus: u32 = read_infos
@@ -75,23 +65,7 @@ where
                     .sum();
                 (read_infos.key().clone(), rcus)
             })
-            .collect())
-    }
-
-    fn region_wcus(&self) -> Result<HashMap<RegionId, WcuCount>> {
-        unimplemented!()
-    }
-
-    fn region_rcus(&self) -> Result<HashMap<RegionId, WcuCount>> {
-        unimplemented!()
-    }
-
-    fn table_wcus(&self) -> Result<HashMap<TableId, WcuCount>> {
-        unimplemented!()
-    }
-
-    fn table_rcus(&self) -> Result<HashMap<TableId, WcuCount>> {
-        unimplemented!()
+            .collect()
     }
 }
 

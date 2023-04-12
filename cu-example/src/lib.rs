@@ -1,2 +1,2 @@
-pub mod simple_collector;
-pub mod simple_reporter;
+pub mod collector;
+pub mod reporter;
