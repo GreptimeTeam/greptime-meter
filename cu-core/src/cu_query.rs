@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::data::ReadRecord;
 use crate::data::WriteRecord;
+use crate::error::Result;
 
 pub type WcuCount = u32;
 pub type RcuCount = u32;
@@ -21,32 +22,32 @@ where
     /// Get all wcu data by region dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn region_wcus(&self) -> HashMap<RegionId, WcuCount>;
+    fn region_wcus(&self) -> Result<HashMap<RegionId, WcuCount>>;
 
     /// Get all rcu data by region dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn region_rcus(&self) -> HashMap<RegionId, WcuCount>;
+    fn region_rcus(&self) -> Result<HashMap<RegionId, WcuCount>>;
 
     /// Get all wcu data by region dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn table_wcus(&self) -> HashMap<TableId, WcuCount>;
+    fn table_wcus(&self) -> Result<HashMap<TableId, WcuCount>>;
 
     /// Get all rcu data by region dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn table_rcus(&self) -> HashMap<TableId, WcuCount>;
+    fn table_rcus(&self) -> Result<HashMap<TableId, WcuCount>>;
 
     /// Get all wcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn schema_wcus(&self) -> HashMap<SchemaId, WcuCount>;
+    fn schema_wcus(&self) -> Result<HashMap<SchemaId, WcuCount>>;
 
     /// Get all rcu data by schema dimension.
     ///
     /// Note: If clear is executed, the previous data will not be counted.
-    fn schema_rcus(&self) -> HashMap<SchemaId, RcuCount>;
+    fn schema_rcus(&self) -> Result<HashMap<SchemaId, RcuCount>>;
 
     /// Clear all data.
     fn clear(&self);
