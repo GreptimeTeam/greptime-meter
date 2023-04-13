@@ -11,3 +11,7 @@ impl WriteCalc for u32 {
         *self
     }
 }
+
+pub trait WriteCalculator<T> {
+    fn calc(&self, value: T) -> u32;
+}
