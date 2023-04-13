@@ -6,8 +6,8 @@ use cu_core::data::WriteRecord;
 use cu_core::global::global_registry;
 use cu_core::registry::Registry;
 use cu_core::write_calc::WriteCalc;
-use cu_example::simple_collector::SimpleCollector;
-use cu_example::simple_reporter::SimpleReporter;
+use cu_example::collector::SimpleCollector;
+use cu_example::reporter::SimpleReporter;
 use cu_macros::wcu;
 
 fn main() {
@@ -30,12 +30,11 @@ async fn setup_global_registry() {
     let collector = Arc::new(SimpleCollector::new(wcu_calc, rcu_calc));
     let reporter = Arc::new(SimpleReporter::new(collector.clone()));
 
-    let mut r = global_registry();
-    r.set_reporter(reporter);
+    let r = global_registry();
     r.set_collector(collector);
 
     tokio::spawn(async move {
-        r.start().await;
+        reporter.start().await;
     });
 }
 
