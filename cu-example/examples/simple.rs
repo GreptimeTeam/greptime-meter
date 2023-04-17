@@ -1,3 +1,17 @@
+// Copyright 2023 Greptime Team
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -5,7 +19,6 @@ use cu_core::data::ReadRecord;
 use cu_core::data::WriteRecord;
 use cu_core::global::global_registry;
 use cu_core::registry::Registry;
-use cu_core::write_calc::WriteCalc;
 use cu_example::collector::SimpleCollector;
 use cu_example::reporter::SimpleReporter;
 use cu_macros::wcu;
@@ -41,16 +54,15 @@ async fn setup_global_registry() {
 async fn do_some_record(r: Registry) {
     struct MockInsertRequest;
 
-    impl WriteCalc for MockInsertRequest {
-        fn byte_count(&self) -> u32 {
+    impl From<&MockInsertRequest> for u32 {
+        fn from(_value: &MockInsertRequest) -> Self {
             1024 * 10
         }
     }
 
     for _i in 0..20 {
         let insert_req = MockInsertRequest {};
-        wcu!("greptime", "db1", insert_req);
-        // wcu!("greptime", "db1", insert_req.byte_count());
+        wcu!("greptime", "db1", (&insert_req).into());
 
         r.record_read(ReadRecord {
             catalog: "greptime".to_string(),
