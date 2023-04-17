@@ -17,7 +17,7 @@
 /// # Examples
 ///
 /// ```rust
-/// use cu_core::write_calc::WriteCalc;
+/// use cu_core::write_calc::WriteCalculator;
 /// use cu_macros::wcu;
 ///
 /// // catalog: "greptime", schema: "public", byte_count: 1024 * 10.
@@ -29,15 +29,26 @@
 /// // catalog: "greptime", schema: "public", table: "system_log", region: 0, byte_count: 1024 * 10.
 /// wcu!("greptime", "public", "system_log", 0, 1024 * 10);
 ///
+/// // calculate byte count of a custom type
 /// struct MockInsert;
-///
-/// impl WriteCalc for MockInsert {
-///     fn byte_count(&self) -> u32 {
+/// // 1. use `From` to calculate the byte count.
+/// impl From<&MockInsert> for u32 {
+///     fn from(_: &MockInsert) -> Self {
 ///         10 * 1024
 ///     }
 /// }
 ///
-/// wcu!("greptime", "public", MockInsert);
+/// wcu!("greptime", "public", (&MockInsert).into());
+///
+/// // 2. use a calculator
+/// struct MockInsertCalculator;
+/// impl WriteCalculator<MockInsert> for MockInsertCalculator {
+///     fn calc_byte(&self, _value: &MockInsert) -> u32 {
+///        10 * 1024
+///     }
+/// }
+/// let calculator = MockInsertCalculator;
+/// wcu!("greptime", "public", calculator.calc_byte(&MockInsert));
 /// ```
 #[macro_export]
 macro_rules! wcu {
@@ -47,7 +58,7 @@ macro_rules! wcu {
             schema: $schema.to_string(),
             table: None,
             region_num: None,
-            byte_count: cu_core::write_calc::WriteCalc::byte_count(&$write_calc),
+            byte_count: $write_calc,
         };
         cu_core::global::global_registry().record_write(record);
     };
@@ -57,7 +68,7 @@ macro_rules! wcu {
             schema: $schema.to_string(),
             table: Some($table.to_string()),
             region_num: None,
-            byte_count: cu_core::write_calc::WriteCalc::byte_count(&$write_calc),
+            byte_count: $write_calc,
         };
         cu_core::global::global_registry().record_write(record);
     };
@@ -67,7 +78,7 @@ macro_rules! wcu {
             schema: $schema.to_string(),
             table: Some($table.to_string()),
             region_num: Some($region),
-            byte_count: cu_core::write_calc::WriteCalc::byte_count(&$write_calc),
+            byte_count: $write_calc,
         };
         cu_core::global::global_registry().record_write(record);
     };

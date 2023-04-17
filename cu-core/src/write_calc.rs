@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Trait representing how to calculate the byte count of a write request.
+/// Trait representing how to calculate the byte count of a custom type.
+/// There are two ways to calculate the byte count of a custom type:
+/// 1. Implement `From<&CustomType> for u32` to get byte count
+/// 2. Implement `WriteCalculator<CustomType>` to hold a calculator to do the counting
+/// Use either way to your condition.
 ///
-/// The `wcu!` macro uses this trait. See the documentation of the `cu-macros`
-/// crate for details.
-pub trait WriteCalc {
-    fn byte_count(&self) -> u32;
-}
-
-impl WriteCalc for u32 {
-    fn byte_count(&self) -> u32 {
-        *self
-    }
-}
-
+/// see `cu-macros` crate for more details.
 pub trait WriteCalculator<T>: Send + Sync {
-    fn calc(&self, value: &T) -> u32;
+    fn calc_byte(&self, value: &T) -> u32;
 }
