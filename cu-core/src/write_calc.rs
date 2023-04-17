@@ -13,5 +13,5 @@ impl WriteCalc for u32 {
 }
 
 pub trait WriteCalculator<T>: Send + Sync {
-    fn calc(&self, value: T) -> u32;
+    fn calc(&self, value: &T) -> u32;
 }
