@@ -5,3 +5,7 @@ edition = "2021"
 
 [dependencies]
 cu-core = { path = "../cu-core" }
+
+[features]
+default = ["noop"]
+noop = []

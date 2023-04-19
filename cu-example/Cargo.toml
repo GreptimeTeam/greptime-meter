@@ -11,4 +11,4 @@ tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 cu-core = { path = "../cu-core" }
-cu-macros = { path = "../cu-macros" }
+cu-macros = { path = "../cu-macros", default-features = false }
