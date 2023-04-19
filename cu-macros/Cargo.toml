@@ -9,3 +9,4 @@ cu-core = { path = "../cu-core" }
 [features]
 default = ["noop"]
 noop = []
+normal = []

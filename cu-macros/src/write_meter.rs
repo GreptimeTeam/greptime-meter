@@ -43,7 +43,6 @@
 ///
 /// write_meter!("greptime", "public", MockInsert);
 /// ```
-
 #[cfg(feature = "noop")]
 #[macro_export]
 macro_rules! write_meter {
