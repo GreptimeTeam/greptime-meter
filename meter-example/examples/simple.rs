@@ -15,14 +15,16 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use cu_core::data::ReadRecord;
-use cu_core::data::WriteRecord;
-use cu_core::global::global_registry;
-use cu_core::registry::Registry;
-use cu_core::write_calc::WriteCalculator;
-use cu_example::collector::SimpleCollector;
-use cu_example::reporter::SimpleReporter;
-use cu_macros::write_meter;
+use meter_core::data::ReadRecord;
+use meter_core::data::WriteRecord;
+use meter_core::global::global_registry;
+use meter_core::registry::Registry;
+use meter_core::write_calc::WriteCalculator;
+use meter_example::collector::SimpleCollector;
+use meter_example::reporter::SimpleReporter;
+use meter_example::CalcImpl;
+use meter_example::MockInsertRequest;
+use meter_macros::write_meter;
 
 fn main() {
     tracing::subscriber::set_global_default(tracing_subscriber::FmtSubscriber::builder().finish())
@@ -94,20 +96,4 @@ fn rcu_calc(r_info: &ReadRecord) -> u32 {
     } = r_info;
 
     *cpu_time / 3 + table_scan / 4096 + network_egress / 4096
-}
-
-struct MockInsertRequest;
-
-pub struct CalcImpl;
-
-impl WriteCalculator<MockInsertRequest> for CalcImpl {
-    fn calc_byte(&self, _value: &MockInsertRequest) -> u32 {
-        1024 * 10
-    }
-}
-
-impl WriteCalculator<String> for CalcImpl {
-    fn calc_byte(&self, _value: &String) -> u32 {
-        1024 * 100
-    }
 }

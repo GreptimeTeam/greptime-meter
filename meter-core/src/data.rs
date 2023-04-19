@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// The WriteRecord records some data about consumed wcu.
+/// The WriteRecord records some data about data insertion.
 #[derive(Debug)]
 pub struct WriteRecord {
     pub catalog: String,
@@ -24,7 +24,7 @@ pub struct WriteRecord {
     pub byte_count: u32,
 }
 
-/// The ReadRecord records some data about consumed rcu.
+/// The ReadRecord records some data about data query.
 #[derive(Debug)]
 pub struct ReadRecord {
     pub catalog: String,

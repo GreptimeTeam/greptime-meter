@@ -18,7 +18,7 @@
 /// 2. Implement `WriteCalculator<CustomType>` to hold a calculator to do the counting
 /// Use either way to your condition.
 ///
-/// see `cu-macros` crate for more details.
+/// see `meter-macros` crate for more details.
 pub trait WriteCalculator<T>: Send + Sync {
     fn calc_byte(&self, value: &T) -> u32;
 }

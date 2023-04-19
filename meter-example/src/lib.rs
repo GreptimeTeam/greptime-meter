@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::data::ReadRecord;
-use crate::data::WriteRecord;
+use meter_core::write_calc::WriteCalculator;
 
-/// Trait representing the methods required to collect read/write record.
-pub trait Collect: Send + Sync {
-    /// Notifies the method that an event that consumes wcu occurs.
-    fn on_read(&self, record: ReadRecord);
+pub mod collector;
+pub mod reporter;
 
-    /// Notifies the method that an event that consumes rcu occurs.
-    fn on_write(&self, record: WriteRecord);
+pub struct MockInsertRequest;
+
+pub struct CalcImpl;
+
+impl WriteCalculator<MockInsertRequest> for CalcImpl {
+    fn calc_byte(&self, _value: &MockInsertRequest) -> u32 {
+        1024 * 10
+    }
+}
+
+impl WriteCalculator<String> for CalcImpl {
+    fn calc_byte(&self, _value: &String) -> u32 {
+        1024 * 100
+    }
 }

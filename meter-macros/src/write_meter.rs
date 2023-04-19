@@ -12,16 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Record the consumption of wcu.
+#[cfg(feature = "noop")]
+#[macro_export]
+macro_rules! write_meter {
+    ($catalog: expr, $schema: expr, $write_calc: expr) => {
+        let _ = ($catalog, $schema, $write_calc);
+    };
+    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
+        let _ = ($catalog, $schema, $table, $write_calc);
+    };
+    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
+        let _ = ($catalog, $schema, $table, $region, $write_calc);
+    };
+}
+
+/// Record some about data insertion.
 ///
 /// # Examples
 ///
 /// ```rust
 /// use std::sync::Arc;
 ///
-/// use cu_core::write_calc::WriteCalculator;
-/// use cu_core::global::global_registry;
-/// use cu_macros::write_meter;
+/// use meter_core::write_calc::WriteCalculator;
+/// use meter_core::global::global_registry;
+/// use meter_macros::write_meter;
 ///
 /// // A struct about insert request
 /// struct MockInsert;
@@ -44,30 +58,16 @@
 /// write_meter!("greptime", "public", MockInsert);
 /// ```
 
-#[cfg(feature = "noop")]
-#[macro_export]
-macro_rules! write_meter {
-    ($catalog: expr, $schema: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $write_calc);
-    };
-    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $write_calc);
-    };
-    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $region, $write_calc);
-    };
-}
-
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! write_meter {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
-        let r = cu_core::global::global_registry();
+        let r = meter_core::global::global_registry();
 
         if let Some(calc) = r.get_calculator() {
             let byte_count = calc.calc_byte(&$write_calc);
 
-            let record = cu_core::data::WriteRecord {
+            let record = meter_core::data::WriteRecord {
                 catalog: $catalog.to_string(),
                 schema: $schema.to_string(),
                 table: None,
@@ -80,12 +80,12 @@ macro_rules! write_meter {
     };
 
     ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let r = cu_core::global::global_registry();
+        let r = meter_core::global::global_registry();
 
         if let Some(calc) = r.get_calculator() {
             let byte_count = calc.calc_byte(&$write_calc);
 
-            let record = cu_core::data::WriteRecord {
+            let record = meter_core::data::WriteRecord {
                 catalog: $catalog.to_string(),
                 schema: $schema.to_string(),
                 table: Some($table.to_string()),
@@ -98,12 +98,12 @@ macro_rules! write_meter {
     };
 
     ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let r = cu_core::global::global_registry();
+        let r = meter_core::global::global_registry();
 
         if let Some(calc) = r.get_calculator() {
             let byte_count = calc.calc_byte(&$write_calc);
 
-            let record = cu_core::data::WriteRecord {
+            let record = meter_core::data::WriteRecord {
                 catalog: $catalog.to_string(),
                 schema: $schema.to_string(),
                 table: Some($table.to_string()),
