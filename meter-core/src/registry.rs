@@ -67,7 +67,7 @@ impl Registry {
 }
 
 impl Registry {
-    /// A base API for recording some about data insertion.
+    /// A base API for recording information about data insertion.
     pub fn record_write(&self, record: WriteRecord) {
         let collector = self.inner.collector.read();
 
@@ -79,7 +79,7 @@ impl Registry {
         collector.on_write(record);
     }
 
-    /// A base API for recording some about data query.
+    /// A base API for recording information about data query.
     pub fn record_read(&self, record: ReadRecord) {
         let collector = self.inner.collector.read();
 
