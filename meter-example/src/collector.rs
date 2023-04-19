@@ -14,10 +14,10 @@
 
 use std::collections::HashMap;
 
-use cu_core::collect::Collect;
-use cu_core::data::ReadRecord;
-use cu_core::data::WriteRecord;
 use dashmap::DashMap;
+use meter_core::collect::Collect;
+use meter_core::data::ReadRecord;
+use meter_core::data::WriteRecord;
 
 pub struct SimpleCollector<W, R> {
     read_data: DashMap<SchemaId, Vec<ReadRecord>>,

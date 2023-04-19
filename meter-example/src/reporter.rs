@@ -16,8 +16,8 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 use std::time::Duration;
 
-use cu_core::data::ReadRecord;
-use cu_core::data::WriteRecord;
+use meter_core::data::ReadRecord;
+use meter_core::data::WriteRecord;
 use tracing::info;
 
 use crate::collector::SimpleCollector;

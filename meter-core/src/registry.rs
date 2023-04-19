@@ -50,7 +50,7 @@ impl Registry {
         *guard = Some(collector);
     }
 
-    /// The calculation formula of 'insert request' -> 'byte count'
+    /// Register the calculation formula of 'insert request' -> 'byte count'
     pub fn register_calculator<T: Send + Sync + 'static>(
         &self,
         calculator: Arc<dyn WriteCalculator<T>>,
@@ -67,7 +67,7 @@ impl Registry {
 }
 
 impl Registry {
-    /// A base API for recording WCU consumption.
+    /// A base API for recording some about data insertion.
     pub fn record_write(&self, record: WriteRecord) {
         let collector = self.inner.collector.read();
 
@@ -79,7 +79,7 @@ impl Registry {
         collector.on_write(record);
     }
 
-    /// A base API for recording RCU consumption.
+    /// A base API for recording some about data query.
     pub fn record_read(&self, record: ReadRecord) {
         let collector = self.inner.collector.read();
 

@@ -1,10 +1,10 @@
 [package]
-name = "cu-macros"
+name = "meter-macros"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-cu-core = { path = "../cu-core" }
+meter-core = { path = "../meter-core" }
 
 [features]
 default = ["noop"]

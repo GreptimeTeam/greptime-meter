@@ -1,12 +1,12 @@
-# greptime-cu
+# greptime-meter
 
 ## OverView
 
-The `greptime-cu` provides an abstraction about w/rcu collection and computation. It consists of the following crates:
+The `greptime-meter` provides an abstraction about data read/write collection and computation. It consists of the following crates:
 
-- cu-core: provides some core traits and data structures about w/rcu collection.
-- cu-macros: provides some macros for for user convenience, include `wcu!` etc.
-- cu-example: provides a simple implementation of `cu-core` and and an example.
+- meter-core: provides some core traits and data structures.
+- meter-macros: provides some macros for for user convenience, include `write_meter!` etc.
+- meter-example: provides a simple implementation of `meter-core` and and an example.
 
 ## Documentation
 

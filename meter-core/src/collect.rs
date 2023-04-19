@@ -12,5 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod collector;
-pub mod reporter;
+use crate::data::ReadRecord;
+use crate::data::WriteRecord;
+
+/// Trait representing the methods required to collect read/write record.
+pub trait Collect: Send + Sync {
+    /// Notifies the method that an event about data insertion occurs.
+    fn on_write(&self, record: WriteRecord);
+
+    /// Notifies the method that an event about data query occurs.
+    fn on_read(&self, record: ReadRecord);
+}
