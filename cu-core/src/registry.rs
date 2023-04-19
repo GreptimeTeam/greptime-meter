@@ -14,20 +14,33 @@
 
 use std::sync::Arc;
 
+use anymap::any::Any;
 use parking_lot::RwLock;
 
 use crate::collect::Collect;
 use crate::data::ReadRecord;
 use crate::data::WriteRecord;
+use crate::write_calc::WriteCalculator;
+
+type CalculatorMap = anymap::Map<dyn Any + Send + Sync>;
 
 #[derive(Default, Clone)]
 pub struct Registry {
     inner: Arc<Inner>,
 }
 
-#[derive(Default)]
 struct Inner {
     collector: RwLock<Option<Arc<dyn Collect>>>,
+    calculator: RwLock<CalculatorMap>,
+}
+
+impl Default for Inner {
+    fn default() -> Self {
+        Self {
+            collector: Default::default(),
+            calculator: RwLock::new(CalculatorMap::new()),
+        }
+    }
 }
 
 impl Registry {
@@ -35,6 +48,21 @@ impl Registry {
     pub fn set_collector(&self, collector: Arc<dyn Collect>) {
         let mut guard = self.inner.collector.write();
         *guard = Some(collector);
+    }
+
+    /// The calculation formula of 'insert request' -> 'byte count'
+    pub fn register_calculator<T: Send + Sync + 'static>(
+        &self,
+        calculator: Arc<dyn WriteCalculator<T>>,
+    ) {
+        let mut guard = self.inner.calculator.write();
+        guard.insert(calculator);
+    }
+
+    /// Obtain the calculation formula corresponding to the insert request.
+    pub fn get_calculator<T: Send + Sync + 'static>(&self) -> Option<Arc<dyn WriteCalculator<T>>> {
+        let guard = self.inner.calculator.read();
+        (*guard).get::<Arc<dyn WriteCalculator<T>>>().cloned()
     }
 }
 

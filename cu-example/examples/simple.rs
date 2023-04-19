@@ -19,9 +19,10 @@ use cu_core::data::ReadRecord;
 use cu_core::data::WriteRecord;
 use cu_core::global::global_registry;
 use cu_core::registry::Registry;
+use cu_core::write_calc::WriteCalculator;
 use cu_example::collector::SimpleCollector;
 use cu_example::reporter::SimpleReporter;
-use cu_macros::wcu;
+use cu_macros::write_meter;
 
 fn main() {
     tracing::subscriber::set_global_default(tracing_subscriber::FmtSubscriber::builder().finish())
@@ -46,23 +47,23 @@ async fn setup_global_registry() {
     let r = global_registry();
     r.set_collector(collector);
 
+    let calc_impl = Arc::new(CalcImpl);
+    let string_insert_calc = calc_impl.clone() as Arc<dyn WriteCalculator<String>>;
+    r.register_calculator(string_insert_calc);
+
+    let mock_insert_calc = calc_impl as Arc<dyn WriteCalculator<MockInsertRequest>>;
+    r.register_calculator(mock_insert_calc);
+
     tokio::spawn(async move {
         reporter.start().await;
     });
 }
 
 async fn do_some_record(r: Registry) {
-    struct MockInsertRequest;
-
-    impl From<&MockInsertRequest> for u32 {
-        fn from(_value: &MockInsertRequest) -> Self {
-            1024 * 10
-        }
-    }
-
     for _i in 0..20 {
-        let insert_req = MockInsertRequest {};
-        wcu!("greptime", "db1", (&insert_req).into());
+        let insert_req = "String insert req".to_string();
+        write_meter!("greptime", "db1", insert_req);
+        write_meter!("greptime", "db1", 1);
 
         r.record_read(ReadRecord {
             catalog: "greptime".to_string(),
@@ -93,4 +94,20 @@ fn rcu_calc(r_info: &ReadRecord) -> u32 {
     } = r_info;
 
     *cpu_time / 3 + table_scan / 4096 + network_egress / 4096
+}
+
+struct MockInsertRequest;
+
+pub struct CalcImpl;
+
+impl WriteCalculator<MockInsertRequest> for CalcImpl {
+    fn calc_byte(&self, _value: &MockInsertRequest) -> u32 {
+        1024 * 10
+    }
+}
+
+impl WriteCalculator<String> for CalcImpl {
+    fn calc_byte(&self, _value: &String) -> u32 {
+        1024 * 100
+    }
 }
