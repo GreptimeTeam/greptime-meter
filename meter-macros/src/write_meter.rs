@@ -16,13 +16,13 @@
 #[macro_export]
 macro_rules! write_meter {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $write_calc);
+        let _ = ($catalog, $schema, &$write_calc);
     };
     ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $write_calc);
+        let _ = ($catalog, $schema, $table, &$write_calc);
     };
     ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $region, $write_calc);
+        let _ = ($catalog, $schema, $table, $region, &$write_calc);
     };
 }
 
