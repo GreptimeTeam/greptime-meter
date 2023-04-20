@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Trait representing how to calculate the byte count of a custom type.
-/// There are two ways to calculate the byte count of a custom type:
-/// 1. Implement `From<&CustomType> for u32` to get byte count
-/// 2. Implement `WriteCalculator<CustomType>` to hold a calculator to do the counting
-/// Use either way to your condition.
+/// Trait representing how to calculate the byte count of a custom type `T`.
+/// Implement `WriteCalculator<T>` and register it to [`crate::registry::Registry`]
+/// and then you can use `write_meter!()` with input of type `T` directly.
 ///
-/// see `meter-macros` crate for more details.
+/// see `meter-macros` crate for example.
 pub trait WriteCalculator<T>: Send + Sync {
     fn calc_byte(&self, value: &T) -> u32;
 }
