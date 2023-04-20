@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::any::Any;
 use std::sync::Arc;
 
-use anymap::any::Any;
 use parking_lot::RwLock;
 
 use crate::collect::Collect;
