@@ -18,12 +18,12 @@ use std::time::Duration;
 use meter_core::data::ReadRecord;
 use meter_core::data::WriteRecord;
 use meter_core::global::global_registry;
-use meter_core::registry::Registry;
 use meter_core::write_calc::WriteCalculator;
 use meter_example::collector::SimpleCollector;
 use meter_example::reporter::SimpleReporter;
 use meter_example::CalcImpl;
 use meter_example::MockInsertRequest;
+use meter_macros::read_meter;
 use meter_macros::write_meter;
 
 fn main() {
@@ -35,11 +35,9 @@ fn main() {
 
 #[tokio::main]
 async fn run() {
-    let r = global_registry();
-
     setup_global_registry().await;
 
-    do_some_record(r).await;
+    do_some_record().await;
 }
 
 async fn setup_global_registry() {
@@ -61,21 +59,16 @@ async fn setup_global_registry() {
     });
 }
 
-async fn do_some_record(r: Registry) {
+async fn do_some_record() {
     for _i in 0..20 {
         let insert_req = "String insert req".to_string();
         write_meter!("greptime", "db1", insert_req);
-        write_meter!("greptime", "db1", 1);
 
-        r.record_read(ReadRecord {
-            catalog: "greptime".to_string(),
-            schema: "db2".to_string(),
-            table: None,
-            region_num: None,
-            cpu_time: 3,
-            table_scan: 0,
-            network_egress: 0,
-        });
+        read_meter!("greptime", "db1", cpu_time: 100000);
+        read_meter!("greptime", "db1", table_scan: 100000);
+        read_meter!("greptime", "db1", network_egress: 100000);
+
+        read_meter!("greptime", "db2", 100000, 100000, 100000);
 
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
