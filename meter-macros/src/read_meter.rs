@@ -15,7 +15,29 @@ macro_rules! read_meter {
     };
 }
 
-// TODO: add doc here
+/// Record some about data query.
+///
+/// # Examples
+///
+/// ```rust
+/// use meter_macros::read_meter;
+///
+/// let cpu_time_ns = 1000000000;
+/// let table_scan_bytes = 10224378;
+/// let network_egress_bytes = 1023123;
+///
+/// read_meter!("greptime", "public", cpu_time: cpu_time_ns);
+/// read_meter!("greptime", "public", table_scan: table_scan_bytes);
+/// read_meter!("greptime", "public", network_egress: network_egress_bytes);
+///
+/// read_meter!(
+///     "greptime",
+///     "public",
+///     cpu_time_ns,
+///     table_scan_bytes,
+///     network_egress_bytes
+/// );
+/// ```
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! read_meter {
@@ -67,27 +89,4 @@ macro_rules! read_meter {
         };
         meter_core::global::global_registry().record_read(record);
     };
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn test_read_meter() {
-        let cpu_time_ns = 1212332131;
-        read_meter!("greptime", "public", cpu_time: cpu_time_ns);
-
-        let table_scan_bytes = 1024123123;
-        read_meter!("greptime", "public", table_scan: table_scan_bytes);
-
-        let network_egress_bytes = 1024123123;
-        read_meter!("greptime", "public", network_egress: network_egress_bytes);
-
-        read_meter!(
-            "greptime",
-            "public",
-            cpu_time_ns,
-            table_scan_bytes,
-            network_egress_bytes
-        );
-    }
 }
