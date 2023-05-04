@@ -68,8 +68,8 @@ macro_rules! write_meter {
             let byte_count = calc.calc_byte(&$write_calc);
 
             let record = meter_core::data::WriteRecord {
-                catalog: $catalog.to_string(),
-                schema: $schema.to_string(),
+                catalog: $catalog.into(),
+                schema: $schema.into(),
                 table: None,
                 region_num: None,
                 byte_count,
@@ -86,9 +86,9 @@ macro_rules! write_meter {
             let byte_count = calc.calc_byte(&$write_calc);
 
             let record = meter_core::data::WriteRecord {
-                catalog: $catalog.to_string(),
-                schema: $schema.to_string(),
-                table: Some($table.to_string()),
+                catalog: $catalog.into(),
+                schema: $schema.into(),
+                table: Some($table.into()),
                 region_num: None,
                 byte_count,
             };
@@ -104,9 +104,9 @@ macro_rules! write_meter {
             let byte_count = calc.calc_byte(&$write_calc);
 
             let record = meter_core::data::WriteRecord {
-                catalog: $catalog.to_string(),
-                schema: $schema.to_string(),
-                table: Some($table.to_string()),
+                catalog: $catalog.into(),
+                schema: $schema.into(),
+                table: Some($table.into()),
                 region_num: Some($region),
                 byte_count,
             };
