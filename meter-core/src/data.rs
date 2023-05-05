@@ -32,19 +32,18 @@ pub struct ReadRecord {
     pub table: Option<String>,
     pub region_num: Option<u32>,
 
-    // TODO(fys): is millisecond accurate enough?
     /// The CPU consumed by query SQL processes.
     ///
-    /// Unit is millisecond.
-    pub cpu_time: u32,
+    /// Unit is nanosecond.
+    pub cpu_time: u64,
 
     /// The data size of table scan plan.
     ///
     /// Unit is byte.
-    pub table_scan: u32,
+    pub table_scan: u64,
 
     /// The size of the network traffic used by the query.
     ///
     /// Unit is byte.
-    pub network_egress: u32,
+    pub network_egress: u64,
 }
