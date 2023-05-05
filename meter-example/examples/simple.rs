@@ -88,5 +88,7 @@ fn rcu_calc(r_info: &ReadRecord) -> u32 {
         ..
     } = r_info;
 
-    *cpu_time / 3 + table_scan / 4096 + network_egress / 4096
+    (*cpu_time / 3 + table_scan / 4096 + network_egress / 4096)
+        .try_into()
+        .unwrap()
 }
