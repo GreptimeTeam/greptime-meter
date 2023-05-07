@@ -19,7 +19,7 @@ macro_rules! read_meter {
         let _ = ($catalog, $schema, $cpu_time);
     };
     ($catalog: expr, $schema: expr, table_scan: $table_scan: expr) => {
-        let _ = ($catalog, $schema, $schema);
+        let _ = ($catalog, $schema, $table_scan);
     };
     ($catalog: expr, $schema: expr, network_egress: $network_egress: expr) => {
         let _ = ($catalog, $schema, $network_egress);
