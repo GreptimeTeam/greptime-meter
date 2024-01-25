@@ -1,4 +1,4 @@
-// Copyright 2023 Greptime Team
+// Copyright 2024 Greptime Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,6 +70,8 @@ async fn do_some_record() {
 
         read_meter!("greptime", "db2", 100000, 100000, 100000);
 
+        read_meter!("greptime", "db3", calculated_value: 100000);
+
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
 }
@@ -85,10 +87,15 @@ fn rcu_calc(r_info: &ReadRecord) -> u32 {
         cpu_time,
         table_scan,
         network_egress,
+        calculated_value,
         ..
     } = r_info;
 
-    (*cpu_time / 3 + table_scan / 4096 + network_egress / 4096)
-        .try_into()
-        .unwrap()
+    if let Some(calculated_value) = calculated_value {
+        (*calculated_value).try_into().unwrap()
+    } else {
+        (*cpu_time / 3 + table_scan / 4096 + network_egress / 4096)
+            .try_into()
+            .unwrap()
+    }
 }

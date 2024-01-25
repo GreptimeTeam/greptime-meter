@@ -1,4 +1,4 @@
-// Copyright 2023 Greptime Team
+// Copyright 2024 Greptime Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@ pub struct WriteRecord {
 
     /// Volume of data written in byte.
     pub byte_count: u32,
+
+    /// The calculated value of this read record.
+    ///
+    /// If present, other fields will be ignored.
+    pub calculated_value: Option<u64>,
 }
 
 /// The ReadRecord records some data about data query.
@@ -46,4 +51,9 @@ pub struct ReadRecord {
     ///
     /// Unit is byte.
     pub network_egress: u64,
+
+    /// The calculated value of this read record.
+    ///
+    /// If present, other fields will be ignored.
+    pub calculated_value: Option<u64>,
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 Greptime Team
+// Copyright 2024 Greptime Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ macro_rules! write_meter {
 ///
 /// write_meter!("greptime", "public", MockInsert);
 /// ```
-
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! write_meter {
@@ -73,6 +72,7 @@ macro_rules! write_meter {
                 table: None,
                 region_num: None,
                 byte_count,
+                calculated_value: None,
             };
 
             r.record_write(record);
