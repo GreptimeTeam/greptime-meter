@@ -94,7 +94,7 @@ where
             schema: record.schema.clone(),
         };
 
-        let mut entry = self.read_data.entry(schema_id).or_insert_with(Vec::new);
+        let mut entry = self.read_data.entry(schema_id).or_default();
 
         entry.push(record)
     }
@@ -105,7 +105,7 @@ where
             schema: record.schema.clone(),
         };
 
-        let mut entry = self.write_data.entry(schema_id).or_insert_with(Vec::new);
+        let mut entry = self.write_data.entry(schema_id).or_default();
 
         entry.push(record)
     }
