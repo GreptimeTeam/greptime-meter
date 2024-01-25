@@ -14,6 +14,7 @@
 
 use std::sync::Arc;
 use std::time::Duration;
+use tracing::info;
 
 use meter_core::data::ReadRecord;
 use meter_core::data::WriteRecord;
@@ -62,7 +63,8 @@ async fn setup_global_registry() {
 async fn do_some_record() {
     for _i in 0..20 {
         let insert_req = "String insert req".to_string();
-        write_meter!("greptime", "db1", insert_req);
+        let wcu = write_meter!("greptime", "db1", insert_req);
+        info!("wcu: {}", wcu);
 
         read_meter!("greptime", "db1", cpu_time: 100000);
         read_meter!("greptime", "db1", table_scan: 100000);

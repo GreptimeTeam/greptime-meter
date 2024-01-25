@@ -16,7 +16,10 @@
 #[macro_export]
 macro_rules! write_meter {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, &$write_calc);
+        {
+            let _ = ($catalog, $schema, &$write_calc);
+            0 as u32
+        }
     };
 }
 
@@ -55,18 +58,21 @@ macro_rules! write_meter {
 #[macro_export]
 macro_rules! write_meter {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
-        let r = meter_core::global::global_registry();
+        {
+            let r = meter_core::global::global_registry();
+            let mut byte_count = 0;
+            if let Some(calc) = r.get_calculator() {
+                byte_count = calc.calc_byte(&$write_calc);
 
-        if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
+                let record = meter_core::data::WriteRecord {
+                    catalog: $catalog.into(),
+                    schema: $schema.into(),
+                    byte_count,
+                };
 
-            let record = meter_core::data::WriteRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                byte_count,
+                r.record_write(record);
             };
-
-            r.record_write(record);
-        };
+            byte_count
+        }
     };
 }

@@ -35,7 +35,6 @@ macro_rules! read_meter {
 ///
 /// let cpu_time_ns = 1000000000;
 /// let table_scan_bytes = 10224378;
-/// let network_egress_bytes = 1023123;
 ///
 /// read_meter!("greptime", "public", cpu_time: cpu_time_ns);
 /// read_meter!("greptime", "public", table_scan: table_scan_bytes);
