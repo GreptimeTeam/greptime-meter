@@ -18,12 +18,6 @@ macro_rules! write_meter {
     ($catalog: expr, $schema: expr, $write_calc: expr) => {
         let _ = ($catalog, $schema, &$write_calc);
     };
-    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, &$write_calc);
-    };
-    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $region, &$write_calc);
-    };
 }
 
 /// Record some about data insertion.
@@ -69,45 +63,6 @@ macro_rules! write_meter {
             let record = meter_core::data::WriteRecord {
                 catalog: $catalog.into(),
                 schema: $schema.into(),
-                table: None,
-                region_num: None,
-                byte_count,
-                calculated_value: None,
-            };
-
-            r.record_write(record);
-        };
-    };
-
-    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let r = meter_core::global::global_registry();
-
-        if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
-
-            let record = meter_core::data::WriteRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                table: Some($table.into()),
-                region_num: None,
-                byte_count,
-            };
-
-            r.record_write(record);
-        };
-    };
-
-    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let r = meter_core::global::global_registry();
-
-        if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
-
-            let record = meter_core::data::WriteRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                table: Some($table.into()),
-                region_num: Some($region),
                 byte_count,
             };
 

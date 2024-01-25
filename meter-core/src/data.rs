@@ -17,16 +17,9 @@
 pub struct WriteRecord {
     pub catalog: String,
     pub schema: String,
-    pub table: Option<String>,
-    pub region_num: Option<u32>,
 
     /// Volume of data written in byte.
     pub byte_count: u32,
-
-    /// The calculated value of this read record.
-    ///
-    /// If present, other fields will be ignored.
-    pub calculated_value: Option<u64>,
 }
 
 /// The ReadRecord records some data about data query.
@@ -34,8 +27,6 @@ pub struct WriteRecord {
 pub struct ReadRecord {
     pub catalog: String,
     pub schema: String,
-    pub table: Option<String>,
-    pub region_num: Option<u32>,
 
     /// The CPU consumed by query SQL processes.
     ///
@@ -46,14 +37,4 @@ pub struct ReadRecord {
     ///
     /// Unit is byte.
     pub table_scan: u64,
-
-    /// The size of the network traffic used by the query.
-    ///
-    /// Unit is byte.
-    pub network_egress: u64,
-
-    /// The calculated value of this read record.
-    ///
-    /// If present, other fields will be ignored.
-    pub calculated_value: Option<u64>,
 }

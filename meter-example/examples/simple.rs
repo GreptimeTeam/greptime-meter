@@ -66,11 +66,8 @@ async fn do_some_record() {
 
         read_meter!("greptime", "db1", cpu_time: 100000);
         read_meter!("greptime", "db1", table_scan: 100000);
-        read_meter!("greptime", "db1", network_egress: 100000);
 
-        read_meter!("greptime", "db2", 100000, 100000, 100000);
-
-        read_meter!("greptime", "db3", calculated_value: 100000);
+        read_meter!("greptime", "db2", 100000, 100000);
 
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
@@ -86,16 +83,10 @@ fn rcu_calc(r_info: &ReadRecord) -> u32 {
     let ReadRecord {
         cpu_time,
         table_scan,
-        network_egress,
-        calculated_value,
         ..
     } = r_info;
 
-    if let Some(calculated_value) = calculated_value {
-        (*calculated_value).try_into().unwrap()
-    } else {
-        (*cpu_time / 3 + table_scan / 4096 + network_egress / 4096)
-            .try_into()
-            .unwrap()
-    }
+    (*cpu_time / 3 + table_scan / 4096)
+        .try_into()
+        .unwrap()
 }
