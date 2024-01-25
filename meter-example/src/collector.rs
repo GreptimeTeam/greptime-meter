@@ -16,14 +16,13 @@ use std::collections::HashMap;
 
 use dashmap::DashMap;
 use meter_core::collect::Collect;
-use meter_core::data::ReadRecord;
-use meter_core::data::WriteRecord;
+use meter_core::data::MeterRecord;
 
 pub struct SimpleCollector<W, R> {
-    read_data: DashMap<SchemaId, Vec<ReadRecord>>,
-    write_data: DashMap<SchemaId, Vec<WriteRecord>>,
-    wcu_calc: W,
-    rcu_calc: R,
+    read_data: DashMap<SchemaId, Vec<MeterRecord>>,
+    write_data: DashMap<SchemaId, Vec<MeterRecord>>,
+    w_calc: W,
+    r_calc: R,
 }
 
 /// The SchemaId identifies a database.
@@ -34,50 +33,50 @@ pub struct SchemaId {
 }
 
 impl<W, R> SimpleCollector<W, R> {
-    pub fn new(wcu_calc: W, rcu_calc: R) -> Self {
+    pub fn new(w_calc: W, r_calc: R) -> Self {
         Self {
             read_data: DashMap::default(),
             write_data: DashMap::default(),
-            wcu_calc,
-            rcu_calc,
+            w_calc,
+            r_calc,
         }
     }
 }
 
 impl<W, R> SimpleCollector<W, R>
 where
-    R: Fn(&ReadRecord) -> u32 + Send + Sync,
-    W: Fn(&WriteRecord) -> u32 + Send + Sync,
+    R: Fn(&MeterRecord) -> u64 + Send + Sync,
+    W: Fn(&MeterRecord) -> u64 + Send + Sync,
 {
     pub fn clear(&self) {
         self.read_data.clear();
         self.write_data.clear();
     }
 
-    pub fn schema_wcus(&self) -> HashMap<SchemaId, u32> {
+    pub fn schema_ws(&self) -> HashMap<SchemaId, u64> {
         self.write_data
             .iter()
             .map(|write_infos| {
-                let wcus: u32 = write_infos
+                let ws: u64 = write_infos
                     .value()
                     .iter()
-                    .map(|wcu_info| (self.wcu_calc)(wcu_info))
+                    .map(|w_info| (self.w_calc)(w_info))
                     .sum();
-                (write_infos.key().clone(), wcus)
+                (write_infos.key().clone(), ws)
             })
             .collect()
     }
 
-    pub fn schema_rcus(&self) -> HashMap<SchemaId, u32> {
+    pub fn schema_rs(&self) -> HashMap<SchemaId, u64> {
         self.read_data
             .iter()
             .map(|read_infos| {
-                let rcus: u32 = read_infos
+                let rs: u64 = read_infos
                     .value()
                     .iter()
-                    .map(|read_info| (self.rcu_calc)(read_info))
+                    .map(|read_info| (self.r_calc)(read_info))
                     .sum();
-                (read_infos.key().clone(), rcus)
+                (read_infos.key().clone(), rs)
             })
             .collect()
     }
@@ -88,7 +87,7 @@ where
     R: Send + Sync,
     W: Send + Sync,
 {
-    fn on_read(&self, record: ReadRecord) {
+    fn on_read(&self, record: MeterRecord) {
         let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),
@@ -99,7 +98,7 @@ where
         entry.push(record)
     }
 
-    fn on_write(&self, record: WriteRecord) {
+    fn on_write(&self, record: MeterRecord) {
         let schema_id = SchemaId {
             catalog: record.catalog.clone(),
             schema: record.schema.clone(),

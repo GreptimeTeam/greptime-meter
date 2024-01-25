@@ -18,9 +18,8 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 
 use crate::collect::Collect;
-use crate::data::ReadRecord;
-use crate::data::WriteRecord;
-use crate::write_calc::WriteCalculator;
+use crate::data::MeterRecord;
+use crate::ItemCalculator;
 
 type CalculatorMap = anymap::Map<dyn Any + Send + Sync>;
 
@@ -53,22 +52,22 @@ impl Registry {
     /// Register the calculation formula of 'insert request' -> 'byte count'
     pub fn register_calculator<T: Send + Sync + 'static>(
         &self,
-        calculator: Arc<dyn WriteCalculator<T>>,
+        calculator: Arc<dyn ItemCalculator<T>>,
     ) {
         let mut guard = self.inner.calculator.write();
         guard.insert(calculator);
     }
 
     /// Obtain the calculation formula corresponding to the insert request.
-    pub fn get_calculator<T: Send + Sync + 'static>(&self) -> Option<Arc<dyn WriteCalculator<T>>> {
+    pub fn get_calculator<T: Send + Sync + 'static>(&self) -> Option<Arc<dyn ItemCalculator<T>>> {
         let guard = self.inner.calculator.read();
-        (*guard).get::<Arc<dyn WriteCalculator<T>>>().cloned()
+        (*guard).get::<Arc<dyn ItemCalculator<T>>>().cloned()
     }
 }
 
 impl Registry {
     /// A base API for recording information about data insertion.
-    pub fn record_write(&self, record: WriteRecord) {
+    pub fn record_write(&self, record: MeterRecord) {
         let collector = self.inner.collector.read();
 
         let collector = match collector.as_ref() {
@@ -80,7 +79,7 @@ impl Registry {
     }
 
     /// A base API for recording information about data query.
-    pub fn record_read(&self, record: ReadRecord) {
+    pub fn record_read(&self, record: MeterRecord) {
         let collector = self.inner.collector.read();
 
         let collector = match collector.as_ref() {

@@ -15,15 +15,10 @@
 #[cfg(feature = "noop")]
 #[macro_export]
 macro_rules! read_meter {
-    ($catalog: expr, $schema: expr, cpu_time: $cpu_time: expr) => {
-        let _ = ($catalog, $schema, $cpu_time);
-    };
-    ($catalog: expr, $schema: expr, table_scan: $table_scan: expr) => {
-        let _ = ($catalog, $schema, $table_scan);
-    };
-    ($catalog: expr, $schema: expr, $cpu_time: expr, $table_scan: expr) => {
-        let _ = ($catalog, $schema, $cpu_time, $table_scan);
-    };
+    ($catalog: expr, $schema: expr, $item: expr) => {{
+        let _ = ($catalog, $schema, $item);
+        0 as u64
+    }};
 }
 
 /// Record some about data query.
@@ -31,49 +26,54 @@ macro_rules! read_meter {
 /// # Examples
 ///
 /// ```rust
+/// use std::sync::Arc;
+///
+/// use meter_core::ItemCalculator;
+/// use meter_core::global::global_registry;
 /// use meter_macros::read_meter;
+/// use meter_core::data::ReadItem;
 ///
 /// let cpu_time_ns = 1000000000;
 /// let table_scan_bytes = 10224378;
 ///
-/// read_meter!("greptime", "public", cpu_time: cpu_time_ns);
-/// read_meter!("greptime", "public", table_scan: table_scan_bytes);
+/// // A struct about insert request
+/// struct MockInsert;
 ///
-/// read_meter!(
-///     "greptime",
-///     "public",
-///     cpu_time_ns,
-///     table_scan_bytes
-/// );
+/// // A byte count calculator of insert request
+/// struct MockInsertCalculator;
+///
+/// impl ItemCalculator<ReadItem> for MockInsertCalculator {
+///     fn calc(&self, _: &ReadItem) -> u64 {
+///        10 * 1024
+///     }
+/// }
+///
+/// let calculator = MockInsertCalculator;
+///
+/// // Register a calculator to [registry].
+/// let registry = global_registry();
+/// registry.register_calculator(Arc::new(MockInsertCalculator));
+///
+/// read_meter!("greptime", "public", ReadItem {
+///     cpu_time: cpu_time_ns,
+///     table_scan: table_scan_bytes,
+/// });
 /// ```
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! read_meter {
-    ($catalog: expr, $schema: expr, cpu_time: $cpu_time: expr) => {
-        let record = meter_core::data::ReadRecord {
-            catalog: $catalog.into(),
-            schema: $schema.into(),
-            cpu_time: $cpu_time,
-            table_scan: 0,
-        };
-        meter_core::global::global_registry().record_read(record);
-    };
-    ($catalog: expr, $schema: expr, table_scan: $table_scan: expr) => {
-        let record = meter_core::data::ReadRecord {
-            catalog: $catalog.into(),
-            schema: $schema.into(),
-            cpu_time: 0,
-            table_scan: $table_scan,
-        };
-        meter_core::global::global_registry().record_read(record);
-    };
-    ($catalog: expr, $schema: expr, $cpu_time: expr, $table_scan: expr) => {
-        let record = meter_core::data::ReadRecord {
-            catalog: $catalog.into(),
-            schema: $schema.into(),
-            cpu_time: $cpu_time,
-            table_scan: $table_scan,
-        };
-        meter_core::global::global_registry().record_read(record);
-    };
+    ($catalog: expr, $schema: expr, $item: expr) => {{
+        let r = meter_core::global::global_registry();
+        let mut value = 0;
+        if let Some(calc) = r.get_calculator() {
+            value = calc.calc(&$item);
+            let record = meter_core::data::MeterRecord {
+                catalog: $catalog.into(),
+                schema: $schema.into(),
+                value: value,
+            };
+            meter_core::global::global_registry().record_read(record);
+        }
+        value
+    }};
 }

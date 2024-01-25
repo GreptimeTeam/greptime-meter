@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use meter_core::write_calc::WriteCalculator;
+use meter_core::data::ReadItem;
+use meter_core::ItemCalculator;
 
 pub mod collector;
 pub mod reporter;
@@ -21,14 +22,20 @@ pub struct MockInsertRequest;
 
 pub struct CalcImpl;
 
-impl WriteCalculator<MockInsertRequest> for CalcImpl {
-    fn calc_byte(&self, _value: &MockInsertRequest) -> u32 {
+impl ItemCalculator<MockInsertRequest> for CalcImpl {
+    fn calc(&self, _value: &MockInsertRequest) -> u64 {
+        1024
+    }
+}
+
+impl ItemCalculator<String> for CalcImpl {
+    fn calc(&self, _value: &String) -> u64 {
         1024 * 10
     }
 }
 
-impl WriteCalculator<String> for CalcImpl {
-    fn calc_byte(&self, _value: &String) -> u32 {
+impl ItemCalculator<ReadItem> for CalcImpl {
+    fn calc(&self, _value: &ReadItem) -> u64 {
         1024 * 100
     }
 }

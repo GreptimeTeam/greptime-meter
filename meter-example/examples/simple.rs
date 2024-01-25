@@ -16,10 +16,11 @@ use std::sync::Arc;
 use std::time::Duration;
 use tracing::info;
 
-use meter_core::data::ReadRecord;
-use meter_core::data::WriteRecord;
+use meter_core::data::MeterRecord;
+use meter_core::data::ReadItem;
 use meter_core::global::global_registry;
-use meter_core::write_calc::WriteCalculator;
+
+use meter_core::ItemCalculator;
 use meter_example::collector::SimpleCollector;
 use meter_example::reporter::SimpleReporter;
 use meter_example::CalcImpl;
@@ -42,18 +43,21 @@ async fn run() {
 }
 
 async fn setup_global_registry() {
-    let collector = Arc::new(SimpleCollector::new(wcu_calc, rcu_calc));
+    let collector = Arc::new(SimpleCollector::new(w_calc, r_calc));
     let reporter = Arc::new(SimpleReporter::new(collector.clone()));
 
     let r = global_registry();
     r.set_collector(collector);
 
     let calc_impl = Arc::new(CalcImpl);
-    let string_insert_calc = calc_impl.clone() as Arc<dyn WriteCalculator<String>>;
+    let string_insert_calc = calc_impl.clone() as Arc<dyn ItemCalculator<String>>;
     r.register_calculator(string_insert_calc);
 
-    let mock_insert_calc = calc_impl as Arc<dyn WriteCalculator<MockInsertRequest>>;
+    let mock_insert_calc = calc_impl.clone() as Arc<dyn ItemCalculator<MockInsertRequest>>;
     r.register_calculator(mock_insert_calc);
+
+    let read_item_calc = calc_impl as Arc<dyn ItemCalculator<ReadItem>>;
+    r.register_calculator(read_item_calc);
 
     tokio::spawn(async move {
         reporter.start().await;
@@ -63,32 +67,29 @@ async fn setup_global_registry() {
 async fn do_some_record() {
     for _i in 0..20 {
         let insert_req = "String insert req".to_string();
-        let wcu = write_meter!("greptime", "db1", insert_req);
-        info!("wcu: {}", wcu);
+        let w = write_meter!("greptime", "db1", insert_req);
+        info!("w: {}", w);
 
-        read_meter!("greptime", "db1", cpu_time: 100000);
-        read_meter!("greptime", "db1", table_scan: 100000);
-
-        read_meter!("greptime", "db2", 100000, 100000);
+        let r = read_meter!(
+            "greptime",
+            "db1",
+            ReadItem {
+                cpu_time: 100000,
+                table_scan: 100000,
+            }
+        );
+        info!("r: {}", r);
 
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
 }
 
-fn wcu_calc(w_info: &WriteRecord) -> u32 {
-    let WriteRecord { byte_count, .. } = w_info;
-
-    byte_count / 1024
+fn w_calc(w_info: &MeterRecord) -> u64 {
+    let MeterRecord { value, .. } = w_info;
+    *value
 }
 
-fn rcu_calc(r_info: &ReadRecord) -> u32 {
-    let ReadRecord {
-        cpu_time,
-        table_scan,
-        ..
-    } = r_info;
-
-    (*cpu_time / 3 + table_scan / 4096)
-        .try_into()
-        .unwrap()
+fn r_calc(r_info: &MeterRecord) -> u64 {
+    let MeterRecord { value, .. } = r_info;
+    *value
 }
