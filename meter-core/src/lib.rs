@@ -16,4 +16,7 @@ pub mod collect;
 pub mod data;
 pub mod global;
 pub mod registry;
-pub mod write_calc;
+
+pub trait ItemCalculator<T>: Send + Sync {
+    fn calc(&self, value: &T) -> u64;
+}

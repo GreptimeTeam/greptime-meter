@@ -16,13 +16,12 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 use std::time::Duration;
 
-use meter_core::data::ReadRecord;
-use meter_core::data::WriteRecord;
+use meter_core::data::MeterRecord;
 use tracing::info;
 
 use crate::collector::SimpleCollector;
 
-/// A simple reporter that outputs wrcu information to stdout.
+/// A simple reporter that outputs w/r information to stdout.
 pub struct SimpleReporter<W, R> {
     collector: Arc<SimpleCollector<W, R>>,
     p1: PhantomData<W>,
@@ -41,31 +40,31 @@ impl<W, R> SimpleReporter<W, R> {
 
 impl<W, R> SimpleReporter<W, R>
 where
-    W: Fn(&WriteRecord) -> u32 + Send + Sync,
-    R: Fn(&ReadRecord) -> u32 + Send + Sync,
+    W: Fn(&MeterRecord) -> u64 + Send + Sync,
+    R: Fn(&MeterRecord) -> u64 + Send + Sync,
 {
     pub async fn start(&self) {
         loop {
             tokio::time::sleep(Duration::from_secs(5)).await;
             info!("===============================================================");
 
-            let wcus = self.collector.schema_wcus();
-            let rcus = self.collector.schema_rcus();
+            let ws = self.collector.schema_ws();
+            let rs = self.collector.schema_rs();
             self.collector.clear();
 
-            info!("The number of WCUs consumed in the last 5 seconds:");
-            for (id, wcu_number) in wcus {
+            info!("The number of Ws consumed in the last 5 seconds:");
+            for (id, w_number) in ws {
                 info!(
-                    "catalog {}, schema {}, wcus: {}",
-                    id.catalog, id.schema, wcu_number
+                    "catalog {}, schema {}, ws: {}",
+                    id.catalog, id.schema, w_number
                 );
             }
 
-            info!("The number of RCUs consumed in the last 5 seconds:");
-            for (id, rcu_number) in rcus {
+            info!("The number of Rs consumed in the last 5 seconds:");
+            for (id, r_number) in rs {
                 info!(
-                    "catalog {}, schema {}, rcus: {}",
-                    id.catalog, id.schema, rcu_number
+                    "catalog {}, schema {}, rs: {}",
+                    id.catalog, id.schema, r_number
                 );
             }
         }

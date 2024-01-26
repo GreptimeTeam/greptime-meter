@@ -15,15 +15,10 @@
 #[cfg(feature = "noop")]
 #[macro_export]
 macro_rules! write_meter {
-    ($catalog: expr, $schema: expr, $write_calc: expr) => {
+    ($catalog: expr, $schema: expr, $write_calc: expr) => {{
         let _ = ($catalog, $schema, &$write_calc);
-    };
-    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, &$write_calc);
-    };
-    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let _ = ($catalog, $schema, $table, $region, &$write_calc);
-    };
+        0 as u64
+    }};
 }
 
 /// Record some about data insertion.
@@ -33,7 +28,7 @@ macro_rules! write_meter {
 /// ```rust
 /// use std::sync::Arc;
 ///
-/// use meter_core::write_calc::WriteCalculator;
+/// use meter_core::ItemCalculator;
 /// use meter_core::global::global_registry;
 /// use meter_macros::write_meter;
 ///
@@ -43,8 +38,8 @@ macro_rules! write_meter {
 /// // A byte count calculator of insert request
 /// struct MockInsertCalculator;
 ///
-/// impl WriteCalculator<MockInsert> for MockInsertCalculator {
-///     fn calc_byte(&self, _: &MockInsert) -> u32 {
+/// impl ItemCalculator<MockInsert> for MockInsertCalculator {
+///     fn calc(&self, _: &MockInsert) -> u64 {
 ///        10 * 1024
 ///     }
 /// }
@@ -60,58 +55,20 @@ macro_rules! write_meter {
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! write_meter {
-    ($catalog: expr, $schema: expr, $write_calc: expr) => {
+    ($catalog: expr, $schema: expr, $req_item: expr) => {{
         let r = meter_core::global::global_registry();
-
+        let mut value = 0;
         if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
+            value = calc.calc(&$req_item);
 
-            let record = meter_core::data::WriteRecord {
+            let record = meter_core::data::MeterRecord {
                 catalog: $catalog.into(),
                 schema: $schema.into(),
-                table: None,
-                region_num: None,
-                byte_count,
-                calculated_value: None,
+                value: value,
             };
 
             r.record_write(record);
         };
-    };
-
-    ($catalog: expr, $schema: expr, $table: expr, $write_calc: expr) => {
-        let r = meter_core::global::global_registry();
-
-        if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
-
-            let record = meter_core::data::WriteRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                table: Some($table.into()),
-                region_num: None,
-                byte_count,
-            };
-
-            r.record_write(record);
-        };
-    };
-
-    ($catalog: expr, $schema: expr, $table: expr, $region: expr, $write_calc: expr) => {
-        let r = meter_core::global::global_registry();
-
-        if let Some(calc) = r.get_calculator() {
-            let byte_count = calc.calc_byte(&$write_calc);
-
-            let record = meter_core::data::WriteRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                table: Some($table.into()),
-                region_num: Some($region),
-                byte_count,
-            };
-
-            r.record_write(record);
-        };
-    };
+        value
+    }};
 }

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::data::ReadRecord;
-use crate::data::WriteRecord;
+use crate::data::MeterRecord;
 
 /// Trait representing the methods required to collect read/write record.
+/// Save read and write separately for later refactoring.
 pub trait Collect: Send + Sync {
     /// Notifies the method that an event about data insertion occurs.
-    fn on_write(&self, record: WriteRecord);
+    fn on_write(&self, record: MeterRecord);
 
     /// Notifies the method that an event about data query occurs.
-    fn on_read(&self, record: ReadRecord);
+    fn on_read(&self, record: MeterRecord);
 }
