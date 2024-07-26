@@ -34,18 +34,36 @@ impl ReadItem {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
+#[repr(u8)]
 #[non_exhaustive]
 pub enum TrafficSource {
-    Prometheus,
-    Influx,
-    HTTP,
-    MySQL,
-    Postgres,
-    GRPC,
-    OTLP,
     #[default]
-    Other,
+    Other = 0u8,
+
+    Prometheus = 1u8,
+    Influx = 2u8,
+    HTTP = 3u8,
+    MySQL = 4u8,
+    Postgres = 5u8,
+    GRPC = 6u8,
+    OTLP = 7u8,
+}
+
+impl From<u8> for TrafficSource {
+    fn from(value: u8) -> Self {
+        match value {
+            1 => TrafficSource::Prometheus,
+            2 => TrafficSource::Influx,
+            3 => TrafficSource::HTTP,
+            4 => TrafficSource::MySQL,
+            5 => TrafficSource::Postgres,
+            6 => TrafficSource::GRPC,
+            7 => TrafficSource::OTLP,
+
+            _ => TrafficSource::Other,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -55,4 +73,42 @@ pub struct MeterRecord {
     pub schema: String,
     pub value: u64,
     pub source: TrafficSource,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_traffic_source_roundtrip() {
+        assert_eq!(
+            TrafficSource::Prometheus,
+            TrafficSource::from(TrafficSource::Prometheus as u8)
+        );
+        assert_eq!(
+            TrafficSource::Influx,
+            TrafficSource::from(TrafficSource::Influx as u8)
+        );
+        assert_eq!(
+            TrafficSource::MySQL,
+            TrafficSource::from(TrafficSource::MySQL as u8)
+        );
+        assert_eq!(
+            TrafficSource::Postgres,
+            TrafficSource::from(TrafficSource::Postgres as u8)
+        );
+        assert_eq!(
+            TrafficSource::GRPC,
+            TrafficSource::from(TrafficSource::GRPC as u8)
+        );
+        assert_eq!(
+            TrafficSource::OTLP,
+            TrafficSource::from(TrafficSource::OTLP as u8)
+        );
+        assert_eq!(
+            TrafficSource::Other,
+            TrafficSource::from(TrafficSource::Other as u8)
+        );
+        assert_eq!(TrafficSource::Other, TrafficSource::from(100u8));
+    }
 }
