@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use meter_core::data::TrafficSource;
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::info;
@@ -67,7 +68,7 @@ async fn setup_global_registry() {
 async fn do_some_record() {
     for _i in 0..20 {
         let insert_req = "String insert req".to_string();
-        let w = write_meter!("greptime", "db1", insert_req);
+        let w = write_meter!("greptime", "db1", insert_req, TrafficSource::Other);
         info!("w: {}", w);
 
         let r = read_meter!(
@@ -76,7 +77,8 @@ async fn do_some_record() {
             ReadItem {
                 cpu_time: 100000,
                 table_scan: 100000,
-            }
+            },
+            TrafficSource::Other
         );
         info!("r: {}", r);
 

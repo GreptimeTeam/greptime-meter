@@ -35,8 +35,23 @@ impl ReadItem {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
+pub enum TrafficSource {
+    Prometheus,
+    Influx,
+    HTTP,
+    MySQL,
+    Postgres,
+    GRPC,
+    OTLP,
+    Other,
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
 pub struct MeterRecord {
     pub catalog: String,
     pub schema: String,
     pub value: u64,
+    pub source: TrafficSource,
 }
