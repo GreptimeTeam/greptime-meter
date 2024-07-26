@@ -57,7 +57,7 @@ macro_rules! read_meter {
 /// read_meter!("greptime", "public", ReadItem {
 ///     cpu_time: cpu_time_ns,
 ///     table_scan: table_scan_bytes,
-/// }, TrafficSource::Other);
+/// }, 0);
 /// ```
 #[cfg(not(feature = "noop"))]
 #[macro_export]

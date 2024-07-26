@@ -51,7 +51,7 @@ macro_rules! write_meter {
 /// let registry = global_registry();
 /// registry.register_calculator(Arc::new(MockInsertCalculator));
 ///
-/// write_meter!("greptime", "public", MockInsert, TrafficSource::Other);
+/// write_meter!("greptime", "public", MockInsert, 0);
 /// ```
 #[cfg(not(feature = "noop"))]
 #[macro_export]
