@@ -30,7 +30,6 @@ macro_rules! write_meter {
 ///
 /// use meter_core::ItemCalculator;
 /// use meter_core::global::global_registry;
-/// use meter_core::data::TrafficSource;
 /// use meter_macros::write_meter;
 ///
 /// // A struct about insert request

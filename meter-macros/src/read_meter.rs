@@ -31,7 +31,7 @@ macro_rules! read_meter {
 /// use meter_core::ItemCalculator;
 /// use meter_core::global::global_registry;
 /// use meter_macros::read_meter;
-/// use meter_core::data::{ReadItem, TrafficSource};
+/// use meter_core::data::ReadItem;
 ///
 /// let cpu_time_ns = 1000000000;
 /// let table_scan_bytes = 10224378;
