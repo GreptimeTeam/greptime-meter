@@ -34,7 +34,7 @@ impl ReadItem {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum TrafficSource {
@@ -52,6 +52,22 @@ pub enum TrafficSource {
 
 impl From<u8> for TrafficSource {
     fn from(value: u8) -> Self {
+        match value {
+            1 => TrafficSource::Prometheus,
+            2 => TrafficSource::Influx,
+            3 => TrafficSource::HTTP,
+            4 => TrafficSource::MySQL,
+            5 => TrafficSource::Postgres,
+            6 => TrafficSource::GRPC,
+            7 => TrafficSource::OTLP,
+
+            _ => TrafficSource::Other,
+        }
+    }
+}
+
+impl From<u32> for TrafficSource {
+    fn from(value: u32) -> Self {
         match value {
             1 => TrafficSource::Prometheus,
             2 => TrafficSource::Influx,
