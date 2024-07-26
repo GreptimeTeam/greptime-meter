@@ -1,2 +1,7 @@
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+
 [workspace]
 members = ["meter-core", "meter-example", "meter-macros"]
+resolver = "2"

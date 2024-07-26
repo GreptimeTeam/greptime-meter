@@ -34,7 +34,7 @@ impl ReadItem {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[non_exhaustive]
 pub enum TrafficSource {
     Prometheus,
@@ -44,6 +44,7 @@ pub enum TrafficSource {
     Postgres,
     GRPC,
     OTLP,
+    #[default]
     Other,
 }
 
