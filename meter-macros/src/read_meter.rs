@@ -15,8 +15,8 @@
 #[cfg(feature = "noop")]
 #[macro_export]
 macro_rules! read_meter {
-    ($catalog: expr, $schema: expr, $item: expr) => {{
-        let _ = ($catalog, $schema, $item);
+    ($catalog: expr, $schema: expr, $item: expr, $source: expr) => {{
+        let _ = ($catalog, $schema, $item, $source);
         0 as u64
     }};
 }
@@ -57,12 +57,12 @@ macro_rules! read_meter {
 /// read_meter!("greptime", "public", ReadItem {
 ///     cpu_time: cpu_time_ns,
 ///     table_scan: table_scan_bytes,
-/// });
+/// }, 0);
 /// ```
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! read_meter {
-    ($catalog: expr, $schema: expr, $item: expr) => {{
+    ($catalog: expr, $schema: expr, $item: expr, $source: expr) => {{
         let r = meter_core::global::global_registry();
         let mut value = 0;
         if let Some(calc) = r.get_calculator() {
@@ -71,6 +71,7 @@ macro_rules! read_meter {
                 catalog: $catalog.into(),
                 schema: $schema.into(),
                 value: value,
+                source: source,
             };
             meter_core::global::global_registry().record_read(record);
         }

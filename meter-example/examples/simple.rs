@@ -67,7 +67,7 @@ async fn setup_global_registry() {
 async fn do_some_record() {
     for _i in 0..20 {
         let insert_req = "String insert req".to_string();
-        let w = write_meter!("greptime", "db1", insert_req);
+        let w = write_meter!("greptime", "db1", insert_req, 0);
         info!("w: {}", w);
 
         let r = read_meter!(
@@ -76,7 +76,8 @@ async fn do_some_record() {
             ReadItem {
                 cpu_time: 100000,
                 table_scan: 100000,
-            }
+            },
+            0
         );
         info!("r: {}", r);
 

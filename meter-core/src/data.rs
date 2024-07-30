@@ -35,8 +35,10 @@ impl ReadItem {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct MeterRecord {
     pub catalog: String,
     pub schema: String,
     pub value: u64,
+    pub source: u8,
 }
