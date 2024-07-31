@@ -65,7 +65,7 @@ macro_rules! write_meter {
                 catalog: $catalog.into(),
                 schema: $schema.into(),
                 value: value,
-                source: source,
+                source: $source,
             };
 
             r.record_write(record);
