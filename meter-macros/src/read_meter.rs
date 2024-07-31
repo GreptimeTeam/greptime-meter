@@ -67,14 +67,10 @@ macro_rules! read_meter {
         let mut value = 0;
         if let Some(calc) = r.get_calculator() {
             value = calc.calc(&$item);
-            let record = meter_core::data::MeterRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                value: value,
-                source: $source,
-            };
-            meter_core::global::global_registry().record_read(record);
-        }
+            let record =
+                meter_core::data::MeterRecord::new($catalog.into(), $schema.into(), value, $source);
+            r.record_read(record);
+        };
         value
     }};
 }

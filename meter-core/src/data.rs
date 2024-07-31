@@ -42,3 +42,14 @@ pub struct MeterRecord {
     pub value: u64,
     pub source: u8,
 }
+
+impl MeterRecord {
+    pub fn new(catalog: String, schema: String, value: u64, source: u8) -> Self {
+        Self {
+            catalog,
+            schema,
+            value,
+            source,
+        }
+    }
+}
