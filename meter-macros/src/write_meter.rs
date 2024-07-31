@@ -61,12 +61,8 @@ macro_rules! write_meter {
         if let Some(calc) = r.get_calculator() {
             value = calc.calc(&$req_item);
 
-            let record = meter_core::data::MeterRecord {
-                catalog: $catalog.into(),
-                schema: $schema.into(),
-                value: value,
-                source: $source,
-            };
+            let record =
+                meter_core::data::MeterRecord::new($catalog.into(), $schema.into(), value, $source);
 
             r.record_write(record);
         };
