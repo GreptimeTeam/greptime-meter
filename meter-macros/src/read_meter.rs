@@ -71,7 +71,7 @@ macro_rules! read_meter {
                 catalog: $catalog.into(),
                 schema: $schema.into(),
                 value: value,
-                source: source,
+                source: $source,
             };
             meter_core::global::global_registry().record_read(record);
         }
