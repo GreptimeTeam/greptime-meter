@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::any::Any;
 use std::sync::Arc;
 
 use parking_lot::RwLock;
@@ -21,7 +20,7 @@ use crate::collect::Collect;
 use crate::data::MeterRecord;
 use crate::ItemCalculator;
 
-type CalculatorMap = anymap::Map<dyn Any + Send + Sync>;
+type CalculatorMap = anymap2::SendSyncAnyMap;
 
 #[derive(Default, Clone)]
 pub struct Registry {
