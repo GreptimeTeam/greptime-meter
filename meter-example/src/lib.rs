@@ -20,6 +20,8 @@ pub mod reporter;
 
 pub struct MockInsertRequest;
 
+pub struct UnknownInsertRequest;
+
 pub struct CalcImpl;
 
 impl ItemCalculator<MockInsertRequest> for CalcImpl {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use meter_example::UnknownInsertRequest;
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::info;
@@ -69,6 +70,9 @@ async fn do_some_record() {
         let insert_req = "String insert req".to_string();
         let w = write_meter!("greptime", "db1", insert_req, 0);
         info!("w: {}", w);
+
+        // [meter]cannot find calculator for type: "meter_example::UnknownInsertRequest"
+        let _ = write_meter!("greptime", "db1", UnknownInsertRequest, 0);
 
         let r = read_meter!(
             "greptime",
