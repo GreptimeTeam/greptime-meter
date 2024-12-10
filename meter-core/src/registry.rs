@@ -15,6 +15,7 @@
 use std::sync::Arc;
 
 use parking_lot::RwLock;
+use tracing::warn;
 
 use crate::collect::Collect;
 use crate::data::MeterRecord;
@@ -60,7 +61,15 @@ impl Registry {
     /// Obtain the calculation formula corresponding to the insert request.
     pub fn get_calculator<T: Send + Sync + 'static>(&self) -> Option<Arc<dyn ItemCalculator<T>>> {
         let guard = self.inner.calculator.read();
-        (*guard).get::<Arc<dyn ItemCalculator<T>>>().cloned()
+        if let Some(calc) = (*guard).get::<Arc<dyn ItemCalculator<T>>>().cloned() {
+            Some(calc)
+        } else {
+            warn!(
+                "[meter]cannot find calculator for type: {:?}",
+                std::any::type_name::<T>()
+            );
+            None
+        }
     }
 }
 
