@@ -12,58 +12,82 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Admit and record writes before dispatch. Successful collection does not imply
+//! successful persistence. Rejection must be handled before dispatching the write.
+//!
+//! ```rust
+//! use std::sync::Arc;
+//! use meter_core::{ItemCalculator, collect::WriteRejected, data::MeterRecord};
+//! use meter_core::global::global_registry;
+//! use meter_macros::write_meter;
+//!
+//! struct InsertRequest;
+//! struct Calculator;
+//! impl ItemCalculator<InsertRequest> for Calculator {
+//!     fn calc(&self, _: &InsertRequest) -> u64 { 1024 }
+//! }
+//!
+//! # async fn example() -> Result<(), WriteRejected> {
+//! global_registry().register_calculator(Arc::new(Calculator));
+//! let request = InsertRequest;
+//! let cost = write_meter!("greptime", "public", request, 10, 0).await?;
+//! // Dispatch `request` only after admission succeeds.
+//!
+//! // Bulk writes can submit a precomputed value without a calculator.
+//! let cost = write_meter!(MeterRecord::new(
+//!     "greptime".into(), "public".into(), 0, 10, 0,
+//! )).await?;
+//! # Ok(())
+//! # }
+//! ```
+
+/// Returns `Ok(0)` without evaluating arguments or invoking collection.
 #[cfg(feature = "noop")]
 #[macro_export]
 macro_rules! write_meter {
-    ($catalog: expr, $schema: expr, $write_calc: expr, $source: expr) => {{
-        let _ = ($catalog, $schema, &$write_calc, $source);
-        0 as u64
+    ($catalog:expr, $schema:expr, $req_item:expr, $rows:expr, $source:expr) => {{
+        // Type-check and mark arguments as used without scanning rows or moving requests.
+        if false {
+            let _ = (&$catalog, &$schema, &$req_item, &$rows, &$source);
+        }
+        std::future::ready(Ok::<u64, meter_core::collect::WriteRejected>(0))
+    }};
+    ($record:expr) => {{
+        if false {
+            let _: &meter_core::data::MeterRecord = &$record;
+        }
+        std::future::ready(Ok::<u64, meter_core::collect::WriteRejected>(0))
     }};
 }
 
-/// Record some about data insertion.
+/// Calculates usage, awaits admission, and returns the calculated value on success.
 ///
-/// # Examples
-///
-/// ```rust
-/// use std::sync::Arc;
-///
-/// use meter_core::ItemCalculator;
-/// use meter_core::global::global_registry;
-/// use meter_macros::write_meter;
-///
-/// // A struct about insert request
-/// struct MockInsert;
-///
-/// // A byte count calculator of insert request
-/// struct MockInsertCalculator;
-///
-/// impl ItemCalculator<MockInsert> for MockInsertCalculator {
-///     fn calc(&self, _: &MockInsert) -> u64 {
-///        10 * 1024
-///     }
-/// }
-///
-/// let calculator = MockInsertCalculator;
-///
-/// // Register a calculator to [registry].
-/// let registry = global_registry();
-/// registry.register_calculator(Arc::new(MockInsertCalculator));
-///
-/// write_meter!("greptime", "public", MockInsert, 0);
-/// ```
+/// Accepts `(catalog, schema, request, rows, source)` or a precomputed `MeterRecord`.
+/// Arguments are evaluated once, and the request is borrowed only for calculation.
+/// Missing calculators supply zero value while still submitting rows for admission.
 #[cfg(not(feature = "noop"))]
 #[macro_export]
 macro_rules! write_meter {
-    ($catalog: expr, $schema: expr, $req_item: expr, $source: expr) => {{
+    ($catalog:expr, $schema:expr, $req_item:expr, $rows:expr, $source:expr) => {{
         let r = meter_core::global::global_registry();
-        let mut value = 0;
-        if let Some(calc) = r.get_calculator() {
-            value = calc.calc(&$req_item);
-            let record =
-                meter_core::data::MeterRecord::new($catalog.into(), $schema.into(), value, $source);
-            r.record_write(record);
-        };
-        value
+        let item = &$req_item;
+        let value = r.get_calculator().map_or(0, |calc| calc.calc(item));
+        $crate::write_meter!(meter_core::data::MeterRecord::new(
+            $catalog.into(),
+            $schema.into(),
+            value,
+            $rows,
+            $source,
+        ))
+    }};
+    ($record:expr) => {{
+        let record: meter_core::data::MeterRecord = $record;
+        async move {
+            let value = record.value;
+            meter_core::global::global_registry()
+                .record_write(record)
+                .await?;
+            Ok::<u64, meter_core::collect::WriteRejected>(value)
+        }
     }};
 }

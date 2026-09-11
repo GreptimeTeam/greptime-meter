@@ -13,9 +13,12 @@
 // limitations under the License.
 
 use std::collections::HashMap;
+use std::future::Future;
+use std::pin::Pin;
 
 use dashmap::DashMap;
 use meter_core::collect::Collect;
+use meter_core::collect::WriteRejected;
 use meter_core::data::MeterRecord;
 
 pub struct SimpleCollector<W, R> {
@@ -98,14 +101,20 @@ where
         entry.push(record)
     }
 
-    fn on_write(&self, record: MeterRecord) {
-        let schema_id = SchemaId {
-            catalog: record.catalog.clone(),
-            schema: record.schema.clone(),
-        };
+    fn on_write(
+        &self,
+        record: MeterRecord,
+    ) -> Pin<Box<dyn Future<Output = Result<(), WriteRejected>> + Send + '_>> {
+        Box::pin(async move {
+            let schema_id = SchemaId {
+                catalog: record.catalog.clone(),
+                schema: record.schema.clone(),
+            };
 
-        let mut entry = self.write_data.entry(schema_id).or_default();
+            let mut entry = self.write_data.entry(schema_id).or_default();
 
-        entry.push(record)
+            entry.push(record);
+            Ok(())
+        })
     }
 }
