@@ -1,3 +1,17 @@
+// Copyright 2026 Greptime Team
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Copyright 2024 Greptime Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,8 +81,13 @@ macro_rules! read_meter {
         let mut value = 0;
         if let Some(calc) = r.get_calculator() {
             value = calc.calc(&$item);
-            let record =
-                meter_core::data::MeterRecord::new($catalog.into(), $schema.into(), value, $source);
+            let record = meter_core::data::MeterRecord::new(
+                $catalog.into(),
+                $schema.into(),
+                value,
+                0,
+                $source,
+            );
             r.record_read(record);
         };
         value
