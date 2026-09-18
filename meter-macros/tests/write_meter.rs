@@ -107,7 +107,14 @@ fn enabled_admission_and_read_contracts() {
     let collector = Arc::new(Collector::default());
     registry.set_collector(collector.clone());
     assert_eq!(
-        complete(write_meter!("catalog", "schema", request, 2, 3)).unwrap(),
+        complete(write_meter!(
+            "catalog",
+            "schema",
+            request,
+            [2_u64, 5].iter().sum(),
+            9_u16.try_into().unwrap()
+        ))
+        .unwrap(),
         7
     );
     assert_eq!(request, "request"); // The insertion request is still available for dispatch.
@@ -198,7 +205,7 @@ fn enabled_admission_and_read_contracts() {
     assert_eq!(
         actual,
         vec![
-            ("catalog", "schema", 7, 2, 3),
+            ("catalog", "schema", 7, 7, 9),
             ("c", "s", 3, 4, 5),
             ("catalog", "schema", 0, u64::MAX, 6),
             ("catalog", "schema", 0, 3, 7),
@@ -217,10 +224,14 @@ fn noop_skips_evaluation_and_admission() {
     let mut evaluations = 0;
     let mut rows = || {
         evaluations += 1;
-        12
+        [2_u64, 5].iter().sum()
     };
     assert_eq!(
-        complete(write_meter!("catalog", "rejected", request, rows(), 3)).unwrap(),
+        complete(write_meter!("catalog", "rejected", request, rows(), {
+            evaluations += 1;
+            9_u16.try_into().unwrap()
+        }))
+        .unwrap(),
         0
     );
     assert_eq!(request, "request");

@@ -62,7 +62,9 @@ macro_rules! write_meter {
     ($catalog:expr, $schema:expr, $req_item:expr, $rows:expr, $source:expr) => {{
         // Type-check and mark arguments as used without scanning rows or moving requests.
         if false {
-            let _ = (&$catalog, &$schema, &$req_item, &$rows, &$source);
+            let _ = (&$catalog, &$schema, &$req_item);
+            let _: &u64 = &$rows;
+            let _: &u8 = &$source;
         }
         std::future::ready(Ok::<u64, meter_core::collect::WriteRejected>(0))
     }};
