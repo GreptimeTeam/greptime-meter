@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,16 +39,20 @@ impl ReadItem {
 pub struct MeterRecord {
     pub catalog: String,
     pub schema: String,
+    /// Calculated metering value. Enterprise uses WCU for writes and RCU for reads.
     pub value: u64,
+    /// Number of insertion rows. Read records must set this to zero.
+    pub rows: u64,
     pub source: u8,
 }
 
 impl MeterRecord {
-    pub fn new(catalog: String, schema: String, value: u64, source: u8) -> Self {
+    pub fn new(catalog: String, schema: String, value: u64, rows: u64, source: u8) -> Self {
         Self {
             catalog,
             schema,
             value,
+            rows,
             source,
         }
     }
